@@ -62,7 +62,7 @@ create table cart
 		
 create table purchase 
 	(purchase_no 	int not null,
-	datestamp 			int(6) not null,
+	datestamp 			int not null,
 	total_price		int not null,
 	primary key (purchase_no));
 	
