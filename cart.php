@@ -1,32 +1,5 @@
-<html>
-	<head>
-		<title>Cart</title>
-	</head>
-	<body>
-		<h1>Cart</h1>
-		<div id="items">
-			
-		</div>
-		<div>
-			<form method="POST" action="cart.php">
-				Address: <input type="text" name="address"/><br/>
-                City: <input type="text" name="city"/><br/>
-                Province: <input type="text" name="province"/><br/>
-                Postal Code: <input type="text" name="postal"/><br/>
-				Date: <input type="text" name="date"/><br/>
-                <h3>Payment</h3><br/>
-                Name: <input type="text" name="name"/><br/>
-                Card Number: <input type="text" name="cardno"/><br/>
-                CVV: <input type="text" name="cvv"/><br/>
-                EXP: mm/yy <input type="text" name="expiry"/><br/>
-                <input type="submit" value="Make Purchase" name="purchase"/>
-			</form>
-		</div>
-		
-	</body>
-</html>
-
-<?php
+<?php 
+$email = "jg@xyz.com"; // hardcoded email for now
 $success = True; //keep track of errors so it redirects the page only if there are no errors
 $db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
@@ -93,17 +66,16 @@ function executeBoundSQL($cmdstr, $list) {
 
 }
 
-function printResult($result) { //prints results from a select statement
-	echo "<h1>Cart</h1><br/>";
+function printCart($cart) {
 	echo "<table>";
-	echo "<tr><th>Album Name</th><th>Artist Name</th><th>Quantity</th></tr>";
+	echo "<tr><th>Album</th><th>Artist</th><th>Price</th><th>Quantity</th></tr>";
 
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		//echo "<tr><td>" . $row["ALBUM"] . "</td><td>" . $row["ARTIST"] . "</td><td>" . $row["QUANTITY"] . "</td></tr>"; //or just use "echo $row[0]" 
-		echo $row[0];
+	while ($row = OCI_Fetch_Array($cart, OCI_BOTH)) {
+		$temp = executePlainSQL("select name, artist from album where albumid=" . $row["ALBUMID"]);
+		$row2 = OCI_Fetch_Array($temp, OCI_BOTH);
+		echo "<tr><td>" . $row2["NAME"] . "</td><td>" . $row2["ARTIST"] . "</td><td>" . $row["PRICE"] . "</td><td>" . $row["QUANTITY"] . "</td></tr>"; //or just use "echo $row[0]" 
 	}
 	echo "</table>";
-
 }
 
 function tableExists($tablename){
@@ -111,11 +83,47 @@ function tableExists($tablename){
 	$exists = OCIExecute($statement, OCI_DEFAULT);
 	return ($exists) ? True : False;
 }
+?>
 
-// Connect Oracle...
+<html>
+	<head>
+		<title>Cart</title>
+	</head>
+	<body>
+		<h1>Cart</h1>
+		<div id="items">
+			<?php
+				if($db_conn){
+					$cart = executePlainSQL("select * from cart where email='". $email . "'");
+					printCart($cart);
+				}else {
+					echo "cannot connect";
+					$e = OCI_Error(); // For OCILogon errors pass no handle
+					echo htmlentities($e['message']);
+				}
+			?>
+		</div>
+		<div>
+			<form method="POST" action="cart.php">
+				Address: <input type="text" name="address"/><br/>
+                City: <input type="text" name="city"/><br/>
+                Province: <input type="text" name="province"/><br/>
+                Postal Code: <input type="text" name="postal"/><br/>
+				Date: <input type="text" name="date"/><br/>
+                <h3>Payment</h3><br/>
+                Name: <input type="text" name="name"/><br/>
+                Card Number: <input type="text" name="cardno"/><br/>
+                CVV: <input type="text" name="cvv"/><br/>
+                EXP: mm/yy <input type="text" name="expiry"/><br/>
+                <input type="submit" value="Make Purchase" name="purchase"/>
+			</form>
+		</div>
+		
+	</body>
+</html>
+
+<?php
 if ($db_conn) {
-	$email = "jg@xyz.com"; // hardcoded email for now
-	
 	/*
 	if(!tableExists('cart')){
 		executePlainSQL("create table cart (email char(30), albumid integer, quantity integer, price float, primary key (email, albumid), foreign key (email) references customer, foreign key (albumid) references album)");
@@ -130,31 +138,22 @@ if ($db_conn) {
 	}
 	*/
 	if (array_key_exists('purchase', $_POST)) {
-		$numprevpurs = executePlainSQL("select count(*) from makes_purchase_of");
-		$orderid = OCI_Fetch_Array($numprevpurs, OCI_BOTH);
-		$currorderid = 1;
-		if($orderid[0] != 0){
-			$maxprevorderid = executePlainSQL("select max(orderno) from makes_purchase_of");
-			$maxorderid = OCI_Fetch_array($maxprevorderid, OCI_BOTH);
-			$currorderid = $maxorderid[0];
-		}
+		//$currorderid = 'orderseq.nextval';
 		
 		$cartitems = executePlainSQL("select albumid, quantity, price from cart where email='" . $email . "'");
 		$totalprice = 0;
-		$consistsindex = 0;
 		$allconsists = array();
 		while($row = OCI_Fetch_Array($cartitems, OCI_BOTH)){
 			$totalprice += ($row["PRICE"] * $row["QUANTITY"]);
 			array_push($allconsists, array(
-				":bind1" => $currorderid,
+				//":bind1" => $currorderid,
 				":bind2" => $row["ALBUMID"],
 				":bind3" => $row["QUANTITY"]
 			));
-			$consistsindex++;
 		}
 		
 		$purchaseentry = array (
-			":bind1" => $currorderid,
+			//":bind1" => $currorderid,
 			":bind2" => $_POST['date'],
 			":bind3" => $totalprice,
 			":bind4" => $email
@@ -163,8 +162,8 @@ if ($db_conn) {
 			$purchaseentry
 		);
 		
-		executeBoundSQL("insert into makes_purchase_of values (:bind1, :bind2, :bind3, :bind4)", $allpurchases);
-		executeBoundSQL("insert into purchase_consists_of values (:bind1, :bind2, :bind3)", $allconsists);
+		executeBoundSQL("insert into makes_purchase_of values (orderseq.nextval, :bind2, :bind3, :bind4)", $allpurchases);
+		executeBoundSQL("insert into purchase_consists_of values (orderseq.currval, :bind2, :bind3)", $allconsists);
 		OCICommit($db_conn);
 
 	} 
