@@ -1,12 +1,12 @@
+drop table branch_employee;
+drop table cart;
+drop table purchase_has_album;
+drop table makes_purchase;
+drop table album_has_song;
+drop table branch_carries_album;
 drop table customer;
 drop table album;
 drop table branch;
-drop table branch_employee;
-drop table cart;
-drop table makes_purchase;
-drop table purchase_has_album;
-drop table album_has_song;
-drop table branch_carries_album;
 
 create table customer
 	(cust_email varchar(50) not null,
@@ -37,7 +37,7 @@ create table branch
 	street_no  varchar(40) not null,
 	city varchar(20) not null,
 	province char(2) not null, 
-	postal_code varchar(6) not null,
+	postal_code varchar(7) not null,
 	primary key (branch_no));
 
 
@@ -96,130 +96,130 @@ insert into customer
 	values ('sleepy@gmail.com', 'Steven', '246');
 	
 insert into album
-	values ('1', '10', '300', '15.00', '2016', 'The Life of Pablo', 'Hip-Hop/Rap', 'Kanye West');
+	values (1, 10, 300, 15.00, 2016, 'The Life of Pablo', 'Hip-Hop/Rap', 'Kanye West');
 	
 insert into album
-	values ('2', '10', '400', '12.00', '2007', 'Graduation', 'Hip-Hop/Rap', 'Kanye West');
+	values (2, 10, 400, 12.00, 2007, 'Graduation', 'Hip-Hop/Rap', 'Kanye West');
 
 insert into album
-	values ('3', '10', '700', '10.00', '2016', 'Cleopatra', 'Alternative', 'The Lumineers');
+	values (3, 10, 700, 10.00, 2016, 'Cleopatra', 'Alternative', 'The Lumineers');
 	
 insert into album
-	values ('4', '10', '50', '9.00', '2000', 'The Life of Pablo', 'Hip-Hop/Rap', 'Kanye West');
+	values (4, 10, 50, 9.00, 2000, 'The Life of Pablo', 'Hip-Hop/Rap', 'Kanye West');
 	
 insert into album
-	values ('5', '10', '1', '8.00', '1990', 'Since I Let You Go', 'Rock', 'Real Ponchos');
+	values (5, 10, 1, 8.00, 1990, 'Since I Let You Go', 'Rock', 'Real Ponchos');
 	
 insert into album_has_song
-	values ('1', '1', 'I Love You');
+	values (1, 1, 'I Love You');
 
 insert into album_has_song
-	values ('6', '1', 'Love');
+	values (6, 1, 'Love');
 	
 insert into album_has_song
-	values ('2', '2', 'I Love You 2');
+	values (2, 2, 'I Love You 2');
 	
 insert into album_has_song
-	values ('3', '3', 'You Love Me');
+	values (3, 3, 'You Love Me');
 	
 insert into album_has_song
-	values ('4', '4', 'She Loves You');
+	values (4, 4, 'She Loves You');
 	
 insert into album_has_song
-	values ('5', '5', 'No One Loves You');
+	values (5, 5, 'No One Loves You');
 	
 insert into branch
-	values ('1', '1200 W 4th Ave', 'Vancouver', 'BC', 'V7R 9K3');
+	values (1, '1200 W 4th Ave', 'Vancouver', 'BC', 'V7R 9K3');
 	
 insert into branch
-	values ('2', '300 Apple Street', 'Vancouver', 'BC', 'V7R 9K3');
+	values (2, '300 Apple Street', 'Vancouver', 'BC', 'V7R 9K3');
 
 insert into branch
-	values ('3', '200 Blackcomb Way', 'Whistler', 'BC', 'G8L 6N8');
+	values (3, '200 Blackcomb Way', 'Whistler', 'BC', 'G8L 6N8');
 	
 insert into branch
-	values ('4', '1500 Main Street', 'Toronto', 'ON', 'N1C 3J6');
+	values (4, '1500 Main Street', 'Toronto', 'ON', 'N1C 3J6');
 
 insert into branch
-	values ('5', '600 North Street', 'Edmonton', 'AB', 'V7R 8B1');
+	values (5, '600 North Street', 'Edmonton', 'AB', 'V7R 8B1');
 	
 insert into branch_employee
-	values ('zack@gmail.com', 'Zack', '123', '1');
+	values ('zack@gmail.com', 'Zack', '123', 1);
 	
 insert into branch_employee
-	values ('tim@gmail.com', 'Tim', '456', '2');
+	values ('tim@gmail.com', 'Tim', '456', 2);
 	
 insert into branch_employee
-	values ('sarah@gmail.com', 'Sarah', '890', '3');
+	values ('sarah@gmail.com', 'Sarah', '890', 3);
 	
 insert into branch_employee
-	values ('andy@gmail.com', 'Andy', '234', '4');
+	values ('andy@gmail.com', 'Andy', '234', 4);
 	
 insert into branch_employee
-	values ('lisa@gmail.com', 'Lisa', '676', '5');
+	values ('lisa@gmail.com', 'Lisa', '676', 5);
 	
 insert into cart
-	values ('jon@gmail.com', '1', '3');
+	values ('jon@gmail.com', 1, 3);
 	
 insert into cart
-	values ('jon@gmail.com', '2', '1');
+	values ('jon@gmail.com', 2, 1);
 	
 insert into cart
-	values ('bob@gmail.com', '3', '6');
+	values ('bob@gmail.com', 3, 6);
 	
 insert into cart
-	values ('jimmyne@gmail.com', '4', '1');
+	values ('jimmyne@gmail.com', 4, 1);
 	
 insert into cart
-	values ('se20@gmail.com', '4', '2');
+	values ('se20@gmail.com', 4, 2);
 	
 insert into cart
-	values ('sleepy@gmail.com', '4', '5');
+	values ('sleepy@gmail.com', 4, 5);
 	
 insert into makes_purchase 
-	values ('1', '011116', '15.00', 'jon@gmail.com');
+	values (1, 11116, 15.00, 'jon@gmail.com');
 		
 insert into makes_purchase 
-	values ('2', '013015', '12.00', 'bob@gmail.com');
+	values (2, 13015, 12.00, 'bob@gmail.com');
 	
 insert into makes_purchase 
-	values ('3', '021714', '30.00', 'bob@gmail.com');
+	values (3, 21714, 30.00, 'bob@gmail.com');
 	
 insert into makes_purchase 
-	values ('4', '071813', '17.00', 'sleepy@gmail.com');
+	values (4, 71813, 17.00, 'sleepy@gmail.com');
 		
 insert into purchase_has_album
-	values ('1', '1', '1');
+	values (1, 1, 1);
 
 insert into purchase_has_album
-	values ('1', '2', '2');
+	values (1, 2, 2);
 	
 insert into purchase_has_album
-	values ('3', '3', '3');
+	values (3, 3, 3);
 	
 insert into purchase_has_album
-	values ('1', '4', '4');
+	values (1, 4, 4);
 	
 insert into purchase_has_album
-	values ('1', '5', '4');
+	values (1, 5, 4);
 	
 insert into branch_carries_album
-	values ('1', '1');
+	values (1, 1);
 	
 insert into branch_carries_album
-	values ('2', '1');
+	values (2, 1);
 	
 insert into branch_carries_album
-	values ('1', '2');
+	values (1, 2);
 	
 insert into branch_carries_album
-	values ('4', '2');
+	values (4, 2);
 	
 insert into branch_carries_album
-	values ('3', '3');
+	values (3, 3);
 
 insert into branch_carries_album
-	values ('5', '4');
+	values (5, 4);
 	
 insert into branch_carries_album
-	values ('5', '5');
+	values (5, 5);
