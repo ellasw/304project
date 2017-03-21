@@ -54,7 +54,7 @@ create table cart
 	album_id int not null,
 	quantity int not null,
 	primary key (cust_email, album_id),
-	foreign key (cust_email) references customer,
+	foreign key (cust_email) references customer ON DELETE CASCADE,
 	foreign key (album_id) references album);
 		
 create table makes_purchase 
@@ -63,7 +63,7 @@ create table makes_purchase
 	total_price int not null,
 	cust_email varchar(50) not null,
 	primary key (purchase_no),
-	foreign key (cust_email) references customer);
+	foreign key (cust_email) references customer ON DELETE CASCADE);
 	
 create table purchase_has_album
 	(quantity int not null,
