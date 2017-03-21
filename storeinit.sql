@@ -29,7 +29,7 @@ create table album_has_song
 	(song_id int not null,
 	album_id int not null,
 	song_title varchar(30) not null,
-	primary key (album_id, song_id),
+	primary key (album_id),
 	foreign key (album_id) references album);
 	
 create table branch
