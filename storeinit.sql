@@ -18,7 +18,7 @@ create table album
 	(album_id int not null,
 	minimum_stock int not null,
 	stock int not null,
-	price int not null,
+	price float not null,
 	year int not null,
 	name varchar(40) not null,
 	genre varchar(20) not null, 
@@ -50,8 +50,7 @@ create table branch_employee
 	foreign key (branch_no) references branch);
 	
 create table cart
-	(total_cost int not null,
-	cust_email varchar(50) not null,
+	(cust_email varchar(50) not null,
 	album_id int not null,
 	quantity int not null,
 	primary key (cust_email, album_id),
@@ -110,3 +109,73 @@ insert into album
 	
 insert into album
 	values ('5', '10', '1', '8.00', '1990', 'Since I Let You Go', 'Rock', 'Real Ponchos');
+	
+insert into album_has_song
+	values ('1', '1', 'I Love You');
+
+insert into album_has_song
+	values ('6', '1', 'Love');
+	
+insert into album_has_song
+	values ('2', '2', 'I Love You 2');
+	
+insert into album_has_song
+	values ('3', '3', 'You Love Me');
+	
+insert into album_has_song
+	values ('4', '4', 'She Loves You');
+	
+insert into album_has_song
+	values ('5', '5', 'No One Loves You');
+	
+insert into branch
+	values ('1', '1200 W 4th Ave', 'Vancouver', 'BC', 'V7R 9K3');
+	
+insert into branch
+	values ('2', '300 Apple Street', 'Vancouver', 'BC', 'V7R 9K3');
+
+insert into branch
+	values ('3', '200 Blackcomb Way', 'Whistler', 'BC', 'G8L 6N8');
+	
+insert into branch
+	values ('4', '1500 Main Street', 'Toronto', 'ON', 'N1C 3J6');
+
+insert into branch
+	values ('5', '600 North Street', 'Edmonton', 'AB', 'V7R 8B1');
+	
+insert into branch_employee
+	values ('zack@gmail.com', 'Zack', '123', '1');
+	
+insert into branch_employee
+	values ('tim@gmail.com', 'Tim', '456', '2');
+	
+insert into branch_employee
+	values ('sarah@gmail.com', 'Sarah', '890', '3');
+	
+insert into branch_employee
+	values ('andy@gmail.com', 'Andy', '234', '4');
+	
+insert into branch_employee
+	values ('lisa@gmail.com', 'Lisa', '676', '5');
+	
+insert into cart
+	values ('jon@gmail.com', '1', '3');
+	
+insert into cart
+	values ('jon@gmail.com', '2', '1');
+	
+insert into cart
+	values ('bob@gmail.com', '3', '6');
+	
+insert into cart
+	values ('jimmyne@gmail.com', '4', '1');
+	
+insert into cart
+	values ('se20@gmail.com', '4', '2');
+	
+insert into cart
+	values ('sleepy@gmail.com', '4', '5');
+	
+
+
+
