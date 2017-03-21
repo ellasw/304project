@@ -6,8 +6,6 @@ drop table branch_employee;
 drop table cart;
 drop table purchase;
 drop table cust_makes_purchase;
-drop table cust_cart;
-drop table cart_has_album;
 drop table purchase_has_album;
 drop table album_has_song;
 drop table branch_carries_album;
@@ -55,6 +53,7 @@ create table cart
 	(price int not null,
 	cust_email varchar(50) not null,
 	album_id int not null,
+	quantity int not null,
 	primary key (cust_email, album_id),
 	foreign key (cust_email) references customer,
 	foreign key (album_id) references album);
@@ -71,23 +70,6 @@ create table cust_makes_purchase
 	primary key (purchase_no, cust_email),
 	foreign key (purchase_no) references purchase,
 	foreign key (cust_email) references customer);
-	
-create table cust_cart
-	(total_price int not null,
-	cust_email varchar(50) not null,
-	album_id int not null,
-	primary key (cust_email),
-	foreign key (cust_email) references customer,
-	foreign key (album_id) references album);
-	
-
-create table cart_has_album
-	(quantity int not null,
-	cust_email varchar(50) not null,
-	album_id int not null,
-	primary key (cust_email, album_id),
-	foreign key (cust_email) references customer,
-	foreign key (album_id) references album);
 	
 create table purchase_has_album
 	(quantity int not null,
