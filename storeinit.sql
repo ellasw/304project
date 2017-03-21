@@ -34,7 +34,7 @@ create table album_has_song
 	
 create table branch
 	(branch_no int not null,
-	street_no int not null,
+	street_no  varchar(40) not null,
 	city varchar(20) not null,
 	province char(2) not null, 
 	postal_code varchar(6) not null,
@@ -71,7 +71,7 @@ create table purchase_has_album
 	purchase_no int not null,
 	primary key (album_id, purchase_no),
 	foreign key (album_id) references album,
-	foreign key (purchase_no) references purchase);
+	foreign key (purchase_no) references makes_purchase);
 	
 create table branch_carries_album 
 	(album_id int not null,
