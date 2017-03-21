@@ -30,7 +30,7 @@ create table album_has_song
 	album_id int not null,
 	song_title varchar(30) not null,
 	primary key (song_id),
-	foreign key (album_id) references album);
+	foreign key (album_id) references album ON DELETE CASCADE);
 	
 create table branch
 	(branch_no int not null,
@@ -47,7 +47,7 @@ create table branch_employee
 	password varchar(20) not null,
 	branch_no int not null,
 	primary key (emp_email),
-	foreign key (branch_no) references branch);
+	foreign key (branch_no) references branch ON DELETE CASCADE);
 	
 create table cart
 	(cust_email varchar(50) not null,
@@ -223,4 +223,3 @@ insert into branch_carries_album
 	
 insert into branch_carries_album
 	values ('5', '5');
-
