@@ -176,6 +176,51 @@ insert into cart
 insert into cart
 	values ('sleepy@gmail.com', '4', '5');
 	
+insert into makes_purchase 
+	values ('1', '011116', '15.00', 'jon@gmail.com');
+		
+insert into makes_purchase 
+	values ('2', '013015', '12.00', 'bob@gmail.com');
+	
+insert into makes_purchase 
+	values ('3', '021714', '30.00', 'bob@gmail.com');
+	
+insert into makes_purchase 
+	values ('4', '071813', '17.00', 'sleepy@gmail.com');
+		
+insert into purchase_has_album
+	values ('1', '1', '1');
 
+insert into purchase_has_album
+	values ('1', '2', '2');
+	
+insert into purchase_has_album
+	values ('3', '3', '3');
+	
+insert into purchase_has_album
+	values ('1', '4', '4');
+	
+insert into purchase_has_album
+	values ('1', '5', '4');
+	
+insert into branch_carries_album
+	values ('1', '1');
+	
+insert into branch_carries_album
+	values ('2', '1');
+	
+insert into branch_carries_album
+	values ('1', '2');
+	
+insert into branch_carries_album
+	values ('4', '2');
+	
+insert into branch_carries_album
+	values ('3', '3');
 
+insert into branch_carries_album
+	values ('5', '4');
+	
+insert into branch_carries_album
+	values ('5', '5');
 
