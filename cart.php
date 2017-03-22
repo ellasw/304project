@@ -1,5 +1,5 @@
 <?php 
-$email = "jg@xyz.com"; // hardcoded email for now
+$email = "jon@gmail.com"; // hardcoded email for now
 $success = True; //keep track of errors so it redirects the page only if there are no errors
 $db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
@@ -71,9 +71,10 @@ function printCart($cart) {
 	echo "<tr><th>Album</th><th>Artist</th><th>Price</th><th>Quantity</th></tr>";
 
 	while ($row = OCI_Fetch_Array($cart, OCI_BOTH)) {
-		$temp = executePlainSQL("select name, artist from album where albumid=" . $row["ALBUMID"]);
+		$temp = executePlainSQL("select name, artist from album where album_id=" . $row["ALBUM_ID"]);
 		$row2 = OCI_Fetch_Array($temp, OCI_BOTH);
-		echo "<tr><td>" . $row2["NAME"] . "</td><td>" . $row2["ARTIST"] . "</td><td>" . $row["PRICE"] . "</td><td>" . $row["QUANTITY"] . "</td></tr>"; //or just use "echo $row[0]" 
+		$price = OCI_Fetch_Array(executePlainSQL("select price from album where album_id=" . $row["ALBUM_ID"]), OCI_BOTH);
+		echo "<tr><td>" . $row2["NAME"] . "</td><td>" . $row2["ARTIST"] . "</td><td>" . $price["PRICE"] . "</td><td>" . $row["QUANTITY"] . "</td></tr>"; //or just use "echo $row[0]" 
 	}
 	echo "</table>";
 }
@@ -94,7 +95,7 @@ function tableExists($tablename){
 		<div id="items">
 			<?php
 				if($db_conn){
-					$cart = executePlainSQL("select * from cart where email='". $email . "'");
+					$cart = executePlainSQL("select * from cart where cust_email='". $email . "'");
 					printCart($cart);
 				}else {
 					echo "cannot connect";
@@ -124,31 +125,17 @@ function tableExists($tablename){
 
 <?php
 if ($db_conn) {
-	/*
-	if(!tableExists('cart')){
-		executePlainSQL("create table cart (email char(30), albumid integer, quantity integer, price float, primary key (email, albumid), foreign key (email) references customer, foreign key (albumid) references album)");
-	}
-	
-	if(!tableExists('makes_purchase_of')){
-		executePlainSQL("create table makes_purchase_of (orderno integer, orderdate char(8), totalprice float, email char(30), primary key (orderno), foreign key (email) references customer)");
-	}
-	
-	if(!tableExists('purchase_consists_of')){
-		executePlainSQL("create table purchase_consists of (orderno integer, albumid integer not null, quantity integer, primary key (orderno, albumid), foreign key (albumid) references album, foreign key (orderno) references makes_purchase_of)");
-	}
-	*/
 	if (array_key_exists('purchase', $_POST)) {
-		//$currorderid = 'orderseq.nextval';
 		
-		$cartitems = executePlainSQL("select albumid, quantity, price from cart where email='" . $email . "'");
+		$cartitems = executePlainSQL("select album_id, quantity from cart where cust_email='" . $email . "'");
 		$totalprice = 0;
 		$allconsists = array();
 		while($row = OCI_Fetch_Array($cartitems, OCI_BOTH)){
-			$totalprice += ($row["PRICE"] * $row["QUANTITY"]);
+			$price = OCI_Fetch_Array(executePlainSQL("select price from album where album_id=" . $row["ALBUM_ID"]), OCI_BOTH);
+			$totalprice += ($price["PRICE"] * $row["QUANTITY"]);
 			array_push($allconsists, array(
-				//":bind1" => $currorderid,
-				":bind2" => $row["ALBUMID"],
-				":bind3" => $row["QUANTITY"]
+				":bind1" => $row["QUANTITY"],
+				":bind2" => $row["ALBUM_ID"]
 			));
 		}
 		
@@ -162,21 +149,36 @@ if ($db_conn) {
 			$purchaseentry
 		);
 		
-		executeBoundSQL("insert into makes_purchase_of values (orderseq.nextval, :bind2, :bind3, :bind4)", $allpurchases);
-		executeBoundSQL("insert into purchase_consists_of values (orderseq.currval, :bind2, :bind3)", $allconsists);
+		executeBoundSQL("insert into makes_purchase values (orderseq.nextval, :bind2, :bind3, :bind4)", $allpurchases);
+		executeBoundSQL("insert into purchase_has_album values (:bind1, :bind2, orderseq.currval)", $allconsists);
 		OCICommit($db_conn);
 
 	} 
-	/*
+	
 	if ($_POST && $success) {
 		//POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
 		header("location: cart.php");
 	} else {
-		// Select data...
-		$result = executePlainSQL("select * from cart");
-		printResult($result);
+		echo "<h3>Purchase Result</h3>";
+		echo "<table><tr><th>PURCHASE NUMBER</th><th>DATE</th><th>TOTAL PRICE</th><th>CUSTOMER EMAIL</th></tr>";
+		$purchase_result = executePlainSQL("select * from makes_purchase where cust_email='" . $email . "'");
+		while($purchase = OCI_Fetch_Array($purchase_result, OCI_BOTH)){
+			echo "<tr><td>" . $purchase["PURCHASE_NO"] . "</td><td>" . $purchase["DATESTAMP"] . "</td><td>" . $purchase["TOTAL_PRICE"] . "</td><td>" . $purchase["CUST_EMAIL"] . "</td></tr>";
+		}
+		echo "</table>";
+		
+		/*
+		echo "<br/>";
+		echo "<h3>Purchase Contains</h3>";
+		echo "<table><tr><th>PURCHASE NUMBER</th><th>ALBUM ID</th><th>QUANTITY</th></tr>";
+		$purchase_has_result = executePlainSQL("select * from purchase_has_album where purchase_no=" . $purchase_result["PURCHASE_NO"]);
+		while($purchase_has = OCI_Fetch_Array($purchase_has_result, OCI_BOTH)){
+			echo "<tr><td>" . $purchase_has["PURCHASE_NO"] . "</td><td>" . $purchase_has["ALBUM_ID"] . "</td><td>" . $purchase_has["QUANTITY"] . "</td><tr>";
+		}
+		echo "</table>";
+		*/
 	}
-	*/
+	
 	//Commit to save changes...
 	OCILogoff($db_conn);
 } else {
