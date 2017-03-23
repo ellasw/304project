@@ -150,9 +150,10 @@ if ($db_conn) {
         $result = executePlainSQL("select Count(*) AS eemail from branch_employee WHERE emp_email = '" . $_POST[emp_email] . "' AND password = '" . $_POST[emp_password] . "'");
         $resultarray = OCI_Fetch_Array($result, OCI_BOTH);
         if ($resultarray["EEMAIL"] > 0) {
-            session_start();
-            $_SESSION["emp_email"] = $_POST[emp_email];
-            $_SESSION["db_conn"] = $db_conn;
+            //session_start();
+            //$_SESSION["emp_email"] = $_POST[emp_email];
+            //$_SESSION["db_conn"] = $db_conn;
+            // header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/emp_browse.php?emp_email=". $_POST[emp_email]);
             header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/emp_browse.php");
             exit;
         } else {
