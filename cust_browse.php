@@ -198,10 +198,13 @@ if ($db_conn) {
         printResult($result);
     }
     elseif (array_key_exists('cart_submit', $_POST)) {
+        // $stock = executePlainSQL("select stock from album where album_id = $_POST[cart_input]");
+        // if ($_POST[cart_quantity] <= stock {
         // Retrieve input from Artist Search
         $result = executePlainSQL("insert into cart values('".$_POST[email_cart_input]."', ".$_POST[cart_input].", ".$_POST[cart_quantity].")");
         OCICommit($db_conn);
         printConfirm();
+    //} else { print an error that quantity entered exceeded stock limit of $stock}
     }
     OCILogoff($db_conn);
 }
