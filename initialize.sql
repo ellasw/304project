@@ -30,7 +30,7 @@ create table album_has_song
 	album_id int not null,
 	song_title varchar(30) not null,
 	primary key (song_id),
-	foreign key (album_id) references album ON DELETE CASCADE);
+	foreign key (album_id) references album);
 	
 create table branch
 	(branch_no int not null,
@@ -71,14 +71,14 @@ create table purchase_has_album
 	quantity int not null,
 	primary key (album_id, purchase_no),
 	foreign key (album_id) references album,
-	foreign key (purchase_no) references makes_purchase);
+	foreign key (purchase_no) references makes_purchase ON DELETE CASCADE);
 	
 create table branch_carries_album 
 	(branch_no int not null,
 	album_id int not null,
 	primary key (album_id, branch_no),
 	foreign key (album_id) references album,
-	foreign key (branch_no) references branch);
+	foreign key (branch_no) references branch ON DELETE CASCADE);
 
 insert into customer
 	values('jon@gmail.com', 'Jon', '123');
