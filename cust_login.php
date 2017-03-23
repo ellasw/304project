@@ -11,15 +11,16 @@
 
 <form method="POST" action="cust_login.php">
     <p>
-        <label for="email">Email</label><br>
-        <input type="text" id = "cust_email" name="cust_email" size = "40"> <br><br>
+        <label for="cust_email">Email</label><br>
+        <input type="email" id = "cust_email" name="cust_email" size = "40"> <br><br>
 
-        <label for="password">Password</label><br>
-        <input type="text" id = "cust_password" name="cust_password" size = "40"><br><br>
+        <label for="cust_password">Password</label><br>
+        <input type="password" id = "cust_password" name="cust_password" size = "40"><br><br>
 
         <input type="submit" value="Log In" name = "cust_login">
     </p>
 </form>
+
 <br>
 <br>
 
@@ -143,8 +144,7 @@ if ($db_conn) {
 
         if ($_POST && $success) {
             //POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
-            header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/cust_login.php");
-            echo "Account Created Successfully.";
+            header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/create_acc_confirm.php");
         } else {
             // Select data...
             $result = executePlainSQL("select * from customer");
@@ -162,7 +162,7 @@ if ($db_conn) {
             session_start();
             $_SESSION["cust_email"] = $_POST[cust_email];
             $_SESSION["db_conn"] = $db_conn;
-            header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/cust_browse.php");
+            header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/cust_browse.php?cust_email=".$_POST[cust_email]);
             exit;
         }
         else{
@@ -190,5 +190,3 @@ else {
     echo htmlentities($e['message']);
 }
 ?>
-
-
