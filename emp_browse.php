@@ -79,6 +79,7 @@
 //this tells the system that it's no longer just parsing
 //html; it's now parsing PHP
 
+//$url_email = $_GET['emp_email'];
 $success = True; //keep track of errors so it redirects the page only if there are no errors
 $db_conn = OCILogon("ora_j2c0b", "a46509148", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
