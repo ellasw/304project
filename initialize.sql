@@ -16,10 +16,10 @@ create table customer
 	
 create table album 
 	(album_id int not null,
-	minimum_stock int not null,
-	stock int not null,
-	price float not null,
-	year int not null,
+	minimum_stock int not null CHECK (minimum_stock >= 0),
+	stock int not null CHECK (stock >= 0),
+	price float not null CHECK (price >= 0),
+	year int not null CHECK (year <= 2017 AND year > 1900),
 	name varchar(40) not null,
 	genre varchar(20) not null, 
 	artist varchar(40) not null,
@@ -52,7 +52,7 @@ create table branch_employee
 create table cart
 	(cust_email varchar(50) not null,
 	album_id int not null,
-	quantity int not null,
+	quantity int not null CHECK (quantity >= 1),
 	primary key (cust_email, album_id),
 	foreign key (cust_email) references customer ON DELETE CASCADE,
 	foreign key (album_id) references album);
@@ -68,7 +68,7 @@ create table makes_purchase
 create table purchase_has_album
 	(purchase_no int not null,
 	album_id int not null,
-	quantity int not null,
+	quantity int not null CHECK (quantity >= 1),
 	primary key (album_id, purchase_no),
 	foreign key (album_id) references album,
 	foreign key (purchase_no) references makes_purchase ON DELETE CASCADE);
