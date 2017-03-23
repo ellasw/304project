@@ -413,6 +413,8 @@ insert into purchase_has_album
 insert into purchase_has_album
 	values (1, 4, 1);
 	
+/* add albums 5-20 with qty 1 to purchase_no 1*/
+	
 insert into purchase_has_album
 	values (2, 5, 1);
 	
