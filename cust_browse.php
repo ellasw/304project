@@ -38,7 +38,7 @@
 <form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="album_search_input">Search For Album:</label><br>
-        <input type="text" id = "album_search_input" name = "album_search_input" size = "40">
+        <input type="text" id = "album_search_input" name = "album_search_input" size = "40">t
         <input type="submit" value="Search" name= album_search_submit>
     </p>
 </form>
@@ -202,14 +202,11 @@ if ($db_conn) {
         printResult($result);
     }
     elseif (array_key_exists('cart_submit', $_POST)) {
-        // $stock = executePlainSQL("select stock from album where album_id = $_POST[cart_input]");
-        // if ($_POST[cart_quantity] <= stock {
         // Retrieve input from Artist Search
         $result = executePlainSQL("insert into cart values('".$_POST['email_cart_input']."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
         OCICommit($db_conn);
         printConfirm();
 		header("location: cart.php?cust_email=" . $email);
-    //} else { print an error that quantity entered exceeded stock limit of $stock}
     }
     OCILogoff($db_conn);
 }

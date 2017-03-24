@@ -1,3 +1,7 @@
+<?php
+    $email = $_GET[cust_email];
+?>
+
 <head>
     <meta charset="UTF-8">
     <title>Customer Account Management</title>
@@ -8,29 +12,55 @@
     <h2>Submit Changes to Customer Account Below:</h2>
 </header>
 
-<form method="POST" action="cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p align="right">
         <input type="submit" value="Return" name="return"/>
     </p>
 </form>
 
-<form method = "POST" action = "cust_manage.php">
+<p style="font-size: x-large">Change Name</p>
+
+    <form method = "POST" action = "cust_manage.php?cust_email=<?php echo $email;?>">
     <p>
-        <label for="change_name">Edit Name:</label><br>
-        <input type="email" name="cust_email" size="30">
-        <input type="text" name="newName" size="30">
-        <input type="submit" value="Update Name" name="NameSubmit">
+        <label for="cust_email">Enter Customer Email:</label><br>
+        <input type="email" name="cust_email" size="30"><br>
+        <label for="change_name">New Name:</label><br>
+        <input type="text" name="newName" size="30"><br>
+        <input type="submit" value="Update Name" name="NameSubmit"><br>
     </p>
 </form>
 
-<form method = "POST" action = "cust_manage.php">
+<p style="font-size: x-large">Change Password</p>
+
+    <form method = "POST" action = "cust_manage.php?cust_email=<?php echo $email;?>">
     <p>
-        <label for="change_pass">Change Password:</label><br>
-        <input type="email" name="cust_email" size="30">
-        <input type="text" name="newPassword" size="30">
-        <input type="submit" value="Update Password" name="PasswordSubmit">
+        <label for="cust_email">Enter Customer Email:</label><br>
+        <input type="email" name="cust_email" size="30"><br>
+        <label for="newPassword">New Password:</label><br>
+        <input type="text" name="newPassword" size="30"><br>
+        <input type="submit" value="Update Password" name="PasswordSubmit"><br>
     </p>
 </form>
+
+<!--<p style="font-size: x-large">Delete Account</p>-->
+<!---->
+<!--<form method = "POST" action = "cust_manage.php">-->
+<!--    <p>-->
+<!--        <label for="cust_email">Customer Email:</label><br>-->
+<!--        <input type="email" name="cust_email" size="30"><br>-->
+<!--        <input type="submit" value="Delete" name="DeleteSubmit"><br>-->
+<!--    </p>-->
+<!--</form>-->
+<!---->
+<!--<p style="font-size: x-large">Delete Branch</p>-->
+<!---->
+<!--<form method = "POST" action = "cust_manage.php">-->
+<!--    <p>-->
+<!--        <label for="branch">Customer Email:</label><br>-->
+<!--        <input type="number" name="branch" size="30"><br>-->
+<!--        <input type="submit" value="Delete" name="BranchSubmit"><br>-->
+<!--    </p>-->
+<!--</form>-->
 
 <?php
 
@@ -112,6 +142,11 @@ if ($db_conn) {
         executePlainSQL("update customer set cust_password = '".$_POST[newName]."' WHERE cust_email = '".$_POST[cust_email]."'");
         OCICommit($db_conn);
     }
+//    elseif (array_key_exists('DeleteSubmit', $_POST)) {
+//        //Getting the values from user and insert data into the table
+//        executePlainSQL("delete from customer WHERE cust_email = '".$_POST[cust_email]."'");
+//        OCICommit($db_conn);
+//    }
     OCILogoff($db_conn);
 }
 else {
