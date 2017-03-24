@@ -1,3 +1,7 @@
+<?php 
+	$email = $_GET['cust_email'];
+?>
+
 <head>
     <meta charset="UTF-8">
     <title>Browse</title>
@@ -14,7 +18,7 @@
 
 <br>
 
-<form method="POST" action="cart.php">
+<form method="POST" action="cart.php?cust_email=<?php echo $email;?>">
     <p align="right">
         <input type="submit" value="Cart" name="cart"/>
     </p>
@@ -23,7 +27,7 @@
 
 <p style="font-size: x-large">Search in the following fields:</p>
 
-<form method = "POST" action = "cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="song_search_input">Search For Song:</label><br>
         <input type="text" id = "song_search_input" name = "song_search_input" size = "40">
@@ -31,7 +35,7 @@
     </p>
 </form>
 
-<form method = "POST" action = "cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="album_search_input">Search For Album:</label><br>
         <input type="text" id = "album_search_input" name = "album_search_input" size = "40">
@@ -39,7 +43,7 @@
     </p>
 </form>
 
-<form method = "POST" action = "cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="artist_search_input">Search For Artist:</label><br>
         <input type="text" id = "artist_search_input" name = "artist_search_input" size = "40">
@@ -50,7 +54,7 @@
 <br>
 
 <p style="font-size: x-large">Add Album to Cart</p>
-<form method = "POST" action = "cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="cart_input">AlbumID</label><br>
         <input type="number" id = "cart_input" name = "cart_input" size = "15"><br>
@@ -68,7 +72,7 @@
 //html; it's now parsing PHP
 
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-$db_conn = OCILogon("ora_j2c0b", "a46509148", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
+$db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
     //echo "<br>running ".$cmdstr."<br>";
@@ -180,26 +184,26 @@ function printConfirm() { //prints results from a select statement
 
 // Connect Oracle...
 if ($db_conn) {
-
+	echo "Welcome, " . $_GET['cust_email'];
     if (array_key_exists('song_search_submit', $_POST)) {
         // Retrieve input from Song Search
-        $result = executePlainSQL("SELECT album_has_song.song_id, album_has_song.song_title, album.album_id, album.name, album.artist, album.genre, album.year FROM album INNER JOIN album_has_song ON album.album_id=album_has_song.album_id AND album_has_song.song_title LIKE '%".$_POST[song_search_input]."%' ORDER BY album.artist");
+        $result = executePlainSQL("SELECT album_has_song.song_id, album_has_song.song_title, album.album_id, album.name, album.artist, album.genre, album.year FROM album INNER JOIN album_has_song ON album.album_id=album_has_song.album_id AND album_has_song.song_title LIKE '%".$_POST['song_search_input']."%' ORDER BY album.artist");
         OCICommit($db_conn);
         printSongResult($result);
     } elseif (array_key_exists('album_search_submit', $_POST)) {
         // Retrieve input from Album Search
-        $result = executePlainSQL("select * from album WHERE name LIKE '%".$_POST[album_search_input]."%'");
+        $result = executePlainSQL("select * from album WHERE name LIKE '%".$_POST['album_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
     } elseif (array_key_exists('artist_search_submit', $_POST)) {
         // Retrieve input from Artist Search
-        $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST[artist_search_input]."%'");
+        $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
     }
     elseif (array_key_exists('cart_submit', $_POST)) {
         // Retrieve input from Artist Search
-        $result = executePlainSQL("insert into cart values('".$_POST[email_cart_input]."', ".$_POST[cart_input].", ".$_POST[cart_quantity].")");
+        $result = executePlainSQL("insert into cart values('".$_POST['email_cart_input']."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
         OCICommit($db_conn);
         printConfirm();
     }

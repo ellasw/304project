@@ -1,45 +1,52 @@
-<head>
-    <meta charset="UTF-8">
-    <title>Customer Login</title>
-</head>
+<?php 
+	//session_start();
+?>
 
-<header>
-    <h1>Customer Login</h1>
-</header>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Customer Login</title>
+	</head>
 
-<p style="font-size: x-large">Have an Account? Log In Now:</p>
+	<body>
+		<header>
+			<h1>Customer Login</h1>
+		</header>
 
-<form method="POST" action="cust_login.php">
-    <p>
-        <label for="email">Email</label><br>
-        <input type="text" id = "cust_email" name="cust_email" size = "40"> <br><br>
+		<p style="font-size: x-large">Have an Account? Log In Now:</p>
 
-        <label for="password">Password</label><br>
-        <input type="text" id = "cust_password" name="cust_password" size = "40"><br><br>
+		<form method="POST" action="cust_login.php">
+			<p>
+				<label for="email">Email</label><br>
+				<input type="text" id = "cust_email" name="cust_email" size = "40"> <br><br>
 
-        <input type="submit" value="Log In" name = "cust_login">
-    </p>
-</form>
-<br>
-<br>
+				<label for="password">Password</label><br>
+				<input type="text" id = "cust_password" name="cust_password" size = "40"><br><br>
 
-<p style="font-size: x-large">Create an Account</p>
+				<input type="submit" value="Log In" name = "cust_login">
+			</p>
+		</form>
+		<br>
+		<br>
 
-<form method="POST" action="cust_login.php">
-    <p>
-        <label for="name">Name</label><br>
-        <input type="text" name="new_name_cust" size = "40"> <br><br>
+		<p style="font-size: x-large">Create an Account</p>
 
-        <label for="new_email">Email</label><br>
-        <input type="email" name="new_email_cust" size = "40"> <br><br>
+		<form method="POST" action="cust_login.php">
+			<p>
+				<label for="name">Name</label><br>
+				<input type="text" name="new_name_cust" size = "40"> <br><br>
 
-        <label for="new_password">Password</label><br>
-        <input type="password" name = "new_password_cust" size = "40"><br><br>
+				<label for="new_email">Email</label><br>
+				<input type="email" name="new_email_cust" size = "40"> <br><br>
 
-        <input type="submit" value ="Create Customer Account" name="create_account_customer">
-    </p>
-</form>
+				<label for="new_password">Password</label><br>
+				<input type="password" name = "new_password_cust" size = "40"><br><br>
 
+				<input type="submit" value ="Create Customer Account" name="create_account_customer">
+			</p>
+		</form>
+	</body>
+</html>
 
 <?php
 
@@ -47,7 +54,7 @@
 //html; it's now parsing PHP
 
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-$db_conn = OCILogon("ora_j2c0b", "a46509148", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
+$db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
     //echo "<br>running ".$cmdstr."<br>";
@@ -143,7 +150,7 @@ if ($db_conn) {
 
         if ($_POST && $success) {
             //POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
-            header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/cust_login.php");
+            header("location: http://www.ugrad.cs.ubc.ca/~t1m8/cust_login.php");
             echo "Account Created Successfully.";
         } else {
             // Select data...
@@ -156,14 +163,13 @@ if ($db_conn) {
     }
     elseif (array_key_exists('cust_login', $_POST)) {
         //Getting the values from user and insert data into the table
-        $result = executePlainSQL("select Count(*) AS cemail from customer WHERE cust_email = '".$_POST[cust_email]."' AND cust_password = '".$_POST[cust_password]."'");
+        $result = executePlainSQL("select Count(*) AS cemail from customer WHERE cust_email = '".$_POST['cust_email']."' AND cust_password = '".$_POST['cust_password']."'");
         $resultarray = OCI_Fetch_Array($result, OCI_BOTH);
         if ($resultarray["CEMAIL"] > 0){
-            session_start();
-            $_SESSION["cust_email"] = $_POST[cust_email];
-            $_SESSION["db_conn"] = $db_conn;
-            header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/cust_browse.php");
-            exit;
+            //$_SESSION["cust_email"] = $_POST['cust_email'];
+            //$_SESSION["db_conn"] = $db_conn;
+            header("location: http://www.ugrad.cs.ubc.ca/~t1m8/cust_browse.php?cust_email=" . $_POST['cust_email']);
+            //exit;
         }
         else{
             echo "Invalid Login. Please try again.";

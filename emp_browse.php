@@ -1,86 +1,95 @@
-<head>
-    <meta charset="UTF-8">
-    <title>Employee Browse</title>
-</head>
+<?php 
+	//session_start();
+	$email = $_GET['emp_email'];
+	echo "Welcome " . $email;
+?>
 
-<header>
-    <h1>Employee Browse</h1>
-</header>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Employee Browse</title>
+	</head>
 
-<p align="right"><input type="submit" value="Log Out" name="logout"/>
-</p><br>
-<p align="right"><input type="submit" value="Cart" name="cart"/>
-</p><br>
+	<body>
+		<header>
+			<h1>Employee Browse</h1>
+		</header>
+
+		<p align="right"><input type="submit" value="Log Out" name="logout"/>
+		</p><br>
+		<p align="right"><input type="submit" value="Cart" name="cart"/>
+		</p><br>
 
 
-</form>
+		</form>
 
 
-<p style="font-size: x-large">Search in the following fields:</p>
+		<p style="font-size: x-large">Search in the following fields:</p>
 
-<p>
-    <label for="search for song">Search For Song:</label><br>
-    <input type="text" name = "search for song" name="Search For Song" size = "40">
-    <input type="submit" value="Search" name= search>  <br><br>
+		<p>
+			<label for="search for song">Search For Song:</label><br>
+			<input type="text" name = "search for song" name="Search For Song" size = "40">
+			<input type="submit" value="Search" name= search>  <br><br>
 
-    <label for="search for album">Search For Album:</label><br>
-    <input type="text" name = "search for album" name="Search For Album" size = "40">
-    <input type="submit" value= "Search" name="searchAlbum" size = "40"><br><br>
+			<label for="search for album">Search For Album:</label><br>
+			<input type="text" name = "search for album" name="Search For Album" size = "40">
+			<input type="submit" value= "Search" name="searchAlbum" size = "40"><br><br>
 
-    <label for="search for album">Search For Artist:</label><br>
-    <input type="text" name = "search for artist" name="Search For Artist" size = "40">
-    <input type="submit" value= "Search" name="searchArtist" size = "40"><br><br>
+			<label for="search for album">Search For Artist:</label><br>
+			<input type="text" name = "search for artist" name="Search For Artist" size = "40">
+			<input type="submit" value= "Search" name="searchArtist" size = "40"><br><br>
 
-</p>
-</form>
-<br>
-<br>
+		</p>
+		</form>
+		<br>
+		<br>
 
-<p>
-    <label for="results"style = "font-size: x-large"> Results:</label><br>
-<table>
-    <tr>
-        <th>
-            Album Name:
-        </th>
-        <th>
-            Artist:
-        </th>
-        <th>
-            Year:
-        </th>
-        <th>
-            Songs:
-        </th>
-        <th>
-            Genre:
-        </th>
-        <th>
-            Price:
-        </th>
-        <th>
-            Stock:
-        </th>
-    </tr>
-    <td>
-        -
-    </td>
-    <td>
-        -
-    </td>
+		<p>
+			<label for="results"style = "font-size: x-large"> Results:</label><br>
+		<table>
+			<tr>
+				<th>
+					Album Name:
+				</th>
+				<th>
+					Artist:
+				</th>
+				<th>
+					Year:
+				</th>
+				<th>
+					Songs:
+				</th>
+				<th>
+					Genre:
+				</th>
+				<th>
+					Price:
+				</th>
+				<th>
+					Stock:
+				</th>
+			</tr>
+			<td>
+				-
+			</td>
+			<td>
+				-
+			</td>
 
-</table>
-<input type="submit" value = "Add To Cart" name = "Add To Cart">
-</p>
-
+		</table>
+		<input type="submit" value = "Add To Cart" name = "Add To Cart">
+		</p>
+	</body>
+</html>
 
 <?php
 
 //this tells the system that it's no longer just parsing
 //html; it's now parsing PHP
-
 $success = True; //keep track of errors so it redirects the page only if there are no errors
 $db_conn = OCILogon("ora_j2c0b", "a46509148", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
+//$db_conn = $_SESSION['db_conn'];
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
     //echo "<br>running ".$cmdstr."<br>";
@@ -173,8 +182,8 @@ function printResult($result) { //prints results from a select statement
 
 // Connect Oracle...
 if ($db_conn) {
-
-    if (array_key_exists('reset', $_POST)) {
+//if($_SESSION['db_conn']){
+	if (array_key_exists('reset', $_POST)) {
         // Drop old table...
         echo "<br> dropping table <br>";
         executePlainSQL("Drop table tab1");
@@ -199,7 +208,7 @@ if ($db_conn) {
 
             if ($_POST && $success) {
                 //POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
-                header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/cust_login.php");
+                header("location: http://www.ugrad.cs.ubc.ca/~t1m8/emp_login.php");
             } else {
                 // Select data...
                 $result = executePlainSQL("select * from tab1");

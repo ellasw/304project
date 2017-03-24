@@ -1,5 +1,5 @@
 <?php 
-$email = "jon@gmail.com"; // hardcoded email for now
+$email = $_GET['cust_email']; // hardcoded email for now
 $success = True; //keep track of errors so it redirects the page only if there are no errors
 $db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
