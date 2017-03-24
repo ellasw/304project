@@ -1,3 +1,7 @@
+<?php
+    $email = $_GET[cust_email];
+?>
+
 <head>
     <meta charset="UTF-8">
     <title>Customer Account Management</title>
@@ -8,7 +12,7 @@
     <h2>Submit Changes to Customer Account Below:</h2>
 </header>
 
-<form method="POST" action="cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p align="right">
         <input type="submit" value="Return" name="return"/>
     </p>
@@ -16,7 +20,7 @@
 
 <p style="font-size: x-large">Change Name</p>
 
-<form method = "POST" action = "cust_manage.php">
+    <form method = "POST" action = "cust_manage.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="cust_email">Enter Customer Email:</label><br>
         <input type="email" name="cust_email" size="30"><br>
@@ -28,7 +32,7 @@
 
 <p style="font-size: x-large">Change Password</p>
 
-<form method = "POST" action = "cust_manage.php">
+    <form method = "POST" action = "cust_manage.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="cust_email">Enter Customer Email:</label><br>
         <input type="email" name="cust_email" size="30"><br>
