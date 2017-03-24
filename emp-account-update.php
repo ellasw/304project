@@ -1,57 +1,3 @@
-<!--Test Oracle file for UBC CPSC304 2011 Winter Term 2
-  Created by Jiemin Zhang
-  Modified by Simona Radu
-  This file shows the very basics of how to execute PHP commands
-  on Oracle.  
-  specifically, it will drop a table, create a table, insert values
-  update values, and then query for values
- 
-  IF YOU HAVE A TABLE CALLED "tab1" IT WILL BE DESTROYED
-
-  The script assumes you already have a server set up
-  All OCI commands are commands to the Oracle libraries
-  To get the file to work, you must place it somewhere where your
-  Apache server can run it, and you must rename it to have a ".php"
-  extension.  You must also change the username and password on the 
-  OCILogon below to be your ORACLE username and password -->
-
-<!-- 
-<p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
-<form method="POST" action="oracle-test.php">
-
-<p><input type="submit" value="Reset" name="reset"></p>
-</form>
-
-<p>Insert values into tab1 below:</p>
-<p><font size="2"> Number&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-Name</font></p>
-<form method="POST" action="oracle-test.php">
-<!~~refresh page when submit~~>
-
-   <p><input type="text" name="insNo" size="6"><input type="text" name="insName" 
-size="18">
-<!~~define two variables to pass the value~~>
-      
-<input type="submit" value="insert" name="insertsubmit"></p>
-</form>
-<!~~ create a form to pass the values. See below for how to 
-get the values~~> 
-
-<p> Update the name by inserting the old and new values below: </p>
-<p><font size="2"> Old Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-New Name</font></p>
-<form method="POST" action="oracle-test.php">
-<!~~refresh page when submit~~>
-
-   <p><input type="text" name="oldName" size="6"><input type="text" name="newName" 
-size="18">
-<!~~define two variables to pass the value~~>
-      
-<input type="submit" value="update" name="updatesubmit"></p>
-<input type="submit" value="run hardcoded queries" name="dostuff"></p>
-</form>
- -->
-
 <p> <font size = "5"> Employee Update Page</font> </p>
 
 <p> <font size = "3" color = "medblue">Edit Existing Employee Account: </font> </p>
@@ -146,9 +92,9 @@ function executeBoundSQL($cmdstr, $list) {
 }
 
 function printResult($result) { //prints results from a select statement
-	echo "<br>Resulting Data:<br>";
+	//echo "<br>Resulting Data:<br>";
 	echo "<table>";
-	//echo "<tr><th>ID</th><th>Name</th></tr>";
+	echo "<tr><th>ID</th><th>Name</th></tr>";
 
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		echo "<tr><td>" . $row["NID"] . "</td><td>" . $row["NAME"] . "</td></tr>"; //or just use "echo $row[0]" 
@@ -157,11 +103,28 @@ function printResult($result) { //prints results from a select statement
 
 }
 
+function printEmployeeResult($result) {
+	echo "<br> All Employees: </br>";
+	echo "<table>";
+	echo "<tr>
+            <th>Name:</th>
+            <th>Email:</th>
+            <th>Password:</th>
+            <th>Branch #:</th>
+        </tr>";
+        
+    while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+     echo "<tr><td>" . $row["name"] . "</td><td>" . $row["emp_email"] . "</td><td>" . $row["password"] . "</td><td>" . $row["branch_no"] . "</td></tr>";
+    }
+    echo "</table>";
+
+}
+
 // Connect Oracle...
 if ($db_conn) {
 	$result = executePlainSQL("select * from branch_employee");
-    //printEmployeeResult($result);
-    // connected:
+	printEmployeeResult($result);
+	
     if (array_key_exists('UpdateEmpAccount', $_POST)) {
 			$EmpEmail   = $_POST['EmpEmail'];
 			$NewEmpName = $_POST['NewEmpName'];
@@ -195,70 +158,11 @@ if ($db_conn) {
 			OCICommit($db_conn);
 			}
 			$result = executePlainSQL("select * from branch_employee");
-			//printEmployeeResult($result);
+			printEmployeeResult($result);
 		} 
-// 		else
-// 		if (array_key_exists('insertsubmit', $_POST)) {
-// 			//Getting the values from user and insert data into the table
-// 			$tuple = array (
-// 				":bind1" => $_POST['insNo'],
-// 				":bind2" => $_POST['insName']
-// 			);
-// 			$alltuples = array (
-// 				$tuple
-// 			);
-// 			executeBoundSQL("insert into tab1 values (:bind1, :bind2)", $alltuples);
-// 			OCICommit($db_conn);
-// 
-// 		} else
-// 			if (array_key_exists('updatesubmit', $_POST)) {
-// 				// Update tuple using data from user
-// 				$tuple = array (
-// 					":bind1" => $_POST['oldName'],
-// 					":bind2" => $_POST['newName']
-// 				);
-// 				$alltuples = array (
-// 					$tuple
-// 				);
-// 				executeBoundSQL("update tab1 set name=:bind2 where name=:bind1", $alltuples);
-// 				OCICommit($db_conn);
-// 
-// 			} else
-// 				if (array_key_exists('dostuff', $_POST)) {
-// 					// Insert data into table...
-// 					executePlainSQL("insert into tab1 values (10, 'Frank')");
-// 					// Inserting data into table using bound variables
-// 					$list1 = array (
-// 						":bind1" => 6,
-// 						":bind2" => "All"
-// 					);
-// 					$list2 = array (
-// 						":bind1" => 7,
-// 						":bind2" => "John"
-// 					);
-// 					$allrows = array (
-// 						$list1,
-// 						$list2
-// 					);
-// 					executeBoundSQL("insert into tab1 values (:bind1, :bind2)", $allrows); //the function takes a list of lists
-// 					// Update data...
-// 					//executePlainSQL("update tab1 set nid=10 where nid=2");
-// 					// Delete data...
-// 					//executePlainSQL("delete from tab1 where nid=1");
-// 					OCICommit($db_conn);
-//				}
-
-	if ($_POST && $success) {
-		//POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
-		header("location: oracle-test.php");
-	} else {
-		// Select data...
-		//$result = executePlainSQL("select * from tab1");
-		printResult($result);
-	}
-
-	//Commit to save changes...
+		
 	OCILogoff($db_conn);
+	
 } else {
 	echo "cannot connect";
 	$e = OCI_Error(); // For OCILogon errors pass no handle
@@ -266,4 +170,5 @@ if ($db_conn) {
 }
 
 ?>
+
 
