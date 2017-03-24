@@ -13,17 +13,39 @@
 <p><input type="submit" value="update account" name="UpdateEmpAccount"></p>
 </form>
 
-<p> <font size = "3" color = "medblue">Delete Existing Employee Account: </font> </p>
+<p> <font size = "3" color = "red">Delete Existing Employee Account: </font> </p>
 <form method="POST" action="emp-account-update.php">
-<p> Employee email: <input type="text" name="EmployeeEmail" size="24"></p>
+<p> Employee email: <input type="text" name="EmpEmailDel" size="24"></p>
 <p><input type="submit" value="delete account" name="DeleteEmpAccount"></p>
 </form>
 
 
+<p> <font size = "3" color = "medblue">Edit Existing Customer Account: </font> </p>
+<form method="POST" action="emp-account-update.php">
+<p> Customer email: <input type="text" name="CustEmailUp" size="24"></p>
+<p> Information to update: </p>
+<p> New Name:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ 			<input type="text" name="NewCustName" size="20"></p>
+<p> New Password:		
+			<input type="text" name="NewCustPass" size="20"></p>
+<p><input type="submit" value="update account" name="UpdateCustAccount"></p>
+</form>
+
+<p> <font size = "3" color = "red">Delete Existing Customer Account: </font> </p>
+<form method="POST" action="emp-account-update.php">
+<p> Customer email: <input type="text" name="CustEmailDel" size="24"></p>
+<p><input type="submit" value="delete account" name="DeleteCustAccount"></p>
+</form>
+
+
+
 <?php
+
+//this tells the system that it's no longer just parsing 
+//html; it's now parsing PHP
+
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-//$db_conn = OCILogon("ora_a2v9a", "a17792145", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
-$db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
+$db_conn = OCILogon("ora_a2v9a", "a17792145", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
@@ -88,8 +110,21 @@ function executeBoundSQL($cmdstr, $list) {
 
 }
 
+function printResult($result) { //prints results from a select statement
+	//echo "<br>Resulting Data:<br>";
+	echo "<table>";
+	echo "<tr><th>ID</th><th>Name</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NID"] . "</td><td>" . $row["NAME"] . "</td></tr>"; //or just use "echo $row[0]" 
+	}
+	echo "</table>";
+
+}
+
+
 function printEmployeeResult($result) {
-	echo "<h3> All Employees: </h3><br>";
+	echo "<br> All Employees: </br>";
 	echo "<table>";
 	echo "<tr>
             <th>Name:</th>
@@ -99,23 +134,39 @@ function printEmployeeResult($result) {
         </tr>";
         
     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-     echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["EMP_EMAIL"] . "</td><td>" . $row["PASSWORD"] . "</td><td>" . $row["BRANCH_NO"] . "</td></tr>";
+     echo "<tr><td>" . $row["name"] . "</td><td>" . $row["emp_email"] . "</td><td>" . $row["password"] . "</td><td>" . $row["branch_no"] . "</td></tr>";
     }
     echo "</table>";
 
 }
 
+function printCustomer($result) { //prints results from a select statement
+    echo "<br>Got data from table customer:<br>";
+    echo "<table>";
+    echo "<tr><th>Email</th><th>Password</th></tr>";
+    while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+        echo "<tr><td>" . $row["CUST_EMAIL"] . "</td><td>" . $row["CUST_NAME"] . "</td><td>" . $row["CUST_PASSWORD"] . "</td></tr>"; //or just use "echo $row[0]"
+    }
+    echo "</table>";
+}
+
 // Connect Oracle...
 if ($db_conn) {
-	//$result = executePlainSQL("select * from branch_employee");
-	//printEmployeeResult($result);
+				$result = executePlainSQL("select * from customer");
+				printCustomer($result);
+
+	//executePlainSQL("insert into branch values (5, '1234', 'city', 'prov', 'zip')";
+
+	//executePlainSQL("insert into branch_employee values ('e@mac.com', 'Frank', '123', 1)");
+// 	$result = executePlainSQL("select * from branch_employee");
+// 	printEmployeeResult($result);
 	
     if (array_key_exists('UpdateEmpAccount', $_POST)) {
-		$EmpEmail   = $_POST['EmpEmail'];
-		$NewEmpName = $_POST['NewEmpName'];
-		$NewEmpPass = $_POST['NewEmpPass'];
-		$NewEmpBranch = $_POST['NewEmpBranch'];
-		if (!empty($NewEmpName) && isset($NewEmpName)) { // update name
+			$EmpEmail   = $_POST['EmpEmail'];
+			$NewEmpName = $_POST['NewEmpName'];
+			$NewEmpPass = $_POST['NewEmpPass'];
+			$NewEmpBranch = $_POST['NewEmpBranch'];
+			if (!empty($NewEmpName) && isset($NewEmpName)) { // update name
 			$tuple = array (
 				":bind1" => $_POST['EmpEmail'],
 				":bind2" => $_POST['NewEmpName'] 
@@ -123,9 +174,9 @@ if ($db_conn) {
 			$alltuples = array ($tuple);
 			executeBoundSQL("update branch_employee set name=:bind2 where emp_email=:bind1", $alltuples);
 			OCICommit($db_conn);
-		}
-		
-		if (!empty($NewEmpPass) && isset($NewEmpPass)) {  //update password
+			
+			}
+			if (!empty($NewEmpPass) && isset($NewEmpPass)) {  //update password
 			$tuple = array (
 				":bind1" => $_POST['EmpEmail'],
 				":bind2" => $_POST['NewEmpPass'] 
@@ -133,9 +184,8 @@ if ($db_conn) {
 			$alltuples = array ($tuple);
 			executeBoundSQL("update branch_employee set password=:bind2 where emp_email=:bind1", $alltuples);
 			OCICommit($db_conn);
-		}
-		
-		if (!empty($NewEmpBranch) && isset($NewEmpBranch)) { //update branch number 
+			}
+			if (!empty($NewEmpBranch) && isset($NewEmpBranch)) { //update branch number 
 			$tuple = array (
 				":bind1" => $_POST['EmpEmail'],
 				":bind2" => $_POST['NewEmpBranch'] 
@@ -143,17 +193,69 @@ if ($db_conn) {
 			$alltuples = array ($tuple);
 			executeBoundSQL("update branch_employee set branch_no=:bind2 where emp_email=:bind1", $alltuples);
 			OCICommit($db_conn);
-		}
+			}
+			$result = executePlainSQL("select * from branch_employee");
+			printEmployeeResult($result);
+		} 
+// 		else 
+// 		if (array_key_exists('DeleteEmpAccount', $_POST) {
+// 			$tuple = array (
+// 				":bind1" => $_POST['EmpEmailDel']
+// 			);
+// 			$alltuples = array ($tuple);
+// 			executeBoundSQL("delete from branch_employee where emp_email=:bind1", $alltuples);
+// 			$result = executePlainSQL("select * from branch_employee");
+// 			OCICommit($db_conn);
+// 			printEmployeeResult($result);
+// 
+// 		} 
+// 		else if (array_key_exists('UpdateCustAccount', $_POST)) {
+// 				$tuple = array (
+// 					":bind1" => $_POST['CustEmailUp'],
+// 					":bind2" => $_POST['NewCustName'],
+// 					":bind3" => $_POST['NewCustPass']
+// 					);
+// 				$alltuples = array ($tuple);
+// 				executeBoundSQL("update customer set cust_name=:bind2, cust_password=:bind3 where cust_email=:bind1", $alltuples);
+// 				OCICommit($db_conn);
+// 				$result = executePlainSQL("select * from customer");
+// 				printCustomer($result);
+// 		}
+		else if (array_key_exists('UpdateCustAccount', $_POST)) {
+					$CustEmailUp   = $_POST['CustEmailUp'];
+					$NewCustName = $_POST['NewCustName'];
+					$NewCustPass = $_POST['NewCustPass'];
+				if (!empty($NewCustName) && isset($NewCustName)) {
+				$tuple = array (
+					":bind1" => $_POST['CustEmailUp'],
+					":bind2" => $_POST['NewCustName']
+				);
+				$alltuples = array ($tuple);
+				executeBoundSQL("update customer set cust_name=:bind2 where cust_email=:bind1", $alltuples);
+				OCICommit($db_conn);
+				}
+				if (!empty($NewCustPass) && isset($NewCustPass)) {
+				$tuple = array (
+					":bind1" => $_POST['CustEmailUp'],
+					":bind2" => $_POST['NewCustPass']
+				);
+				$alltuples = array ($tuple);
+				executeBoundSQL("update customer set cust_password=:bind2 where cust_email=:bind1", $alltuples);
+				OCICommit($db_conn);
+				}
+				$result = executePlainSQL("select * from customer");
+				printCustomer($result);
+
+
+				}
 		
-	} 
-	
-	if($_POST && success){
-		header("location: emp-account-update.php");
-	}else{
-		$result = executePlainSQL("select * from branch_employee");
-		printEmployeeResult($result);
-	}
-		
+		 
+// 		if($_POST && success){
+// 		header("location: emp-account-update.php");
+// 	}else{
+// 		$result = executePlainSQL("select * from branch_employee");
+// 		printEmployeeResult($result);
+// 	}		
 	OCILogoff($db_conn);
 	
 } else {
@@ -163,5 +265,4 @@ if ($db_conn) {
 }
 
 ?>
-
 
