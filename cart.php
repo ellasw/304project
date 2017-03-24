@@ -79,12 +79,6 @@ function printCart($cart) {
 	}
 	echo "</table>";
 }
-
-function tableExists($tablename){
-	$statement = "select 1 from " . $tablename;
-	$exists = OCIExecute($statement, OCI_DEFAULT);
-	return ($exists) ? True : False;
-}
 ?>
 
 <html>
@@ -170,7 +164,7 @@ if ($db_conn) {
 	
 	if ($_POST && $success) {
 		//POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
-		header("location: cart.php?cust_email=" . $email);
+		header("location: purchase_receipt.php?cust_email=" . $email);
 	} else {
 		/*
 		if($newpurno > 0){

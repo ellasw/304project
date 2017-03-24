@@ -18,7 +18,7 @@
 
 <br>
 
-<form method="POST" action="cart.php?cust_email=<?php echo $email;?>">
+<form method="POST" action="cust_browse.php?cust_email=<?php echo $email;?>">
     <p align="right">
         <input type="submit" value="Cart" name="cart"/>
     </p>
@@ -31,15 +31,15 @@
     <p>
         <label for="song_search_input">Search For Song:</label><br>
         <input type="text" id = "song_search_input" name = "song_search_input" size = "40">
-        <input type="submit" value="Search" name= song_search_submit>
+        <input type="submit" value="Search" name= "song_search_submit">
     </p>
 </form>
 
 <form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="album_search_input">Search For Album:</label><br>
-        <input type="text" id = "album_search_input" name = "album_search_input" size = "40">t
-        <input type="submit" value="Search" name= album_search_submit>
+        <input type="text" id = "album_search_input" name = "album_search_input" size = "40">
+        <input type="submit" value="Search" name= "album_search_submit">
     </p>
 </form>
 
@@ -47,7 +47,7 @@
     <p>
         <label for="artist_search_input">Search For Artist:</label><br>
         <input type="text" id = "artist_search_input" name = "artist_search_input" size = "40">
-        <input type="submit" value="Search" name= artist_search_submit>
+        <input type="submit" value="Search" name= "artist_search_submit">
     </p>
 </form>
 
@@ -62,7 +62,7 @@
         <input type="email" id = "email_cart_input" name = "email_cart_input" size = "50"><br>
         <label for="cart_quantity">Quantity</label><br>
         <input type="number" id = "cart_quantity" name = "cart_quantity" size = "15"><br>
-        <input type="submit" value="Add to Cart" name= cart_submit><br>
+        <input type="submit" value="Add to Cart" name= "cart_submit"><br>
     </p>
 </form>
 
@@ -200,14 +200,16 @@ if ($db_conn) {
         $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
-    }
-    elseif (array_key_exists('cart_submit', $_POST)) {
+	}elseif (array_key_exists('cart_submit', $_POST)) {
         // Retrieve input from Artist Search
         $result = executePlainSQL("insert into cart values('".$_POST['email_cart_input']."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
         OCICommit($db_conn);
         printConfirm();
+		//header("location: cart.php?cust_email=" . $email);
+		header("location: cust_browse.php?cust_email=" . $email);
+    }elseif (array_key_exists('cart', $_POST)){
 		header("location: cart.php?cust_email=" . $email);
-    }
+	}
     OCILogoff($db_conn);
 }
 
