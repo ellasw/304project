@@ -208,6 +208,7 @@ if ($db_conn) {
         $result = executePlainSQL("insert into cart values('".$_POST['email_cart_input']."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
         OCICommit($db_conn);
         printConfirm();
+		header("location: cart.php?cust_email=" . $email);
     //} else { print an error that quantity entered exceeded stock limit of $stock}
     }
     OCILogoff($db_conn);
