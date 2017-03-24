@@ -1,5 +1,4 @@
 <?php 
-	//session_start();
 	$email = $_GET['emp_email'];
 	echo "Welcome " . $email;
 ?>
@@ -84,12 +83,8 @@
 </html>
 
 <?php
-
-//this tells the system that it's no longer just parsing
-//html; it's now parsing PHP
 $success = True; //keep track of errors so it redirects the page only if there are no errors
 $db_conn = OCILogon("ora_j2c0b", "a46509148", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
-//$db_conn = $_SESSION['db_conn'];
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
     //echo "<br>running ".$cmdstr."<br>";
@@ -166,23 +161,8 @@ function printResult($result) { //prints results from a select statement
 
 }
 
-//function create_table(){
-//    global $db_conn;
-//    if ($db_conn){
-//        echo "<br> dropping table <br>";
-//        executePlainSQL("Drop table tab1");
-//
-//        // Create new table...
-//        echo "<br> creating new table <br>";
-//        executePlainSQL("create table tab1 (nid number, name varchar2(30), primary key (nid))");
-//        OCICommit($db_conn);
-//
-//    }
-//}
-
 // Connect Oracle...
 if ($db_conn) {
-//if($_SESSION['db_conn']){
 	if (array_key_exists('reset', $_POST)) {
         // Drop old table...
         echo "<br> dropping table <br>";

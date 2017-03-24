@@ -1,7 +1,3 @@
-<?php 
-	//session_start();
-?>
-
 <html>
 	<head>
 		<meta charset="UTF-8">
@@ -17,12 +13,11 @@
 
 		<form method="POST" action="cust_login.php">
 			<p>
-				<label for="email">Email</label><br>
+				<label for="cust_email">Email</label><br>
 				<input type="text" id = "cust_email" name="cust_email" size = "40"> <br><br>
 
-				<label for="password">Password</label><br>
-				<input type="text" id = "cust_password" name="cust_password" size = "40"><br><br>
-
+				<label for="cust_password">Password</label><br>
+				<input type="password" id = "cust_password" name="cust_password" size = "40"><br><br>
 				<input type="submit" value="Log In" name = "cust_login">
 			</p>
 		</form>
@@ -49,10 +44,6 @@
 </html>
 
 <?php
-
-//this tells the system that it's no longer just parsing
-//html; it's now parsing PHP
-
 $success = True; //keep track of errors so it redirects the page only if there are no errors
 $db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
@@ -149,11 +140,8 @@ if ($db_conn) {
         OCICommit($db_conn);
 
         if ($_POST && $success) {
-            //POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
-            header("location: http://www.ugrad.cs.ubc.ca/~t1m8/cust_login.php");
-            echo "Account Created Successfully.";
+            header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/create_acc_confirm.php");
         } else {
-            // Select data...
             $result = executePlainSQL("select * from customer");
             printResult($result);
         }
@@ -166,28 +154,14 @@ if ($db_conn) {
         $result = executePlainSQL("select Count(*) AS cemail from customer WHERE cust_email = '".$_POST['cust_email']."' AND cust_password = '".$_POST['cust_password']."'");
         $resultarray = OCI_Fetch_Array($result, OCI_BOTH);
         if ($resultarray["CEMAIL"] > 0){
-            //$_SESSION["cust_email"] = $_POST['cust_email'];
-            //$_SESSION["db_conn"] = $db_conn;
             header("location: http://www.ugrad.cs.ubc.ca/~t1m8/cust_browse.php?cust_email=" . $_POST['cust_email']);
-            //exit;
-        }
+            exit;
+		}
         else{
             echo "Invalid Login. Please try again.";
         }
-        //OCICommit($db_conn);
 
-//        if ($_POST && $success) {
-//            //POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
-//            header("location: http://www.ugrad.cs.ubc.ca/~j2c0b/cust_login.php");
-//            echo "Account Created Successfully.";
-//        } else {
-//            // Select data...
-//            $result = executePlainSQL("select * from customer");
-//            printResult($result);
-//        }
-
-        //Commit to save changes...
-        //OCILogoff($db_conn);
+        OCILogoff($db_conn);
     }
 }
 else {
@@ -196,5 +170,3 @@ else {
     echo htmlentities($e['message']);
 }
 ?>
-
-
