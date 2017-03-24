@@ -1,3 +1,7 @@
+<?php
+$email = $_GET[cust_email];
+?>
+
 <head>
     <meta charset="UTF-8">
     <title>Browse</title>
@@ -23,7 +27,7 @@
 
 <p style="font-size: x-large">Search in the following fields:</p>
 
-<form method = "POST" action = "cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="song_search_input">Search For Song:</label><br>
         <input type="text" id = "song_search_input" name = "song_search_input" size = "40">
@@ -31,15 +35,15 @@
     </p>
 </form>
 
-<form method = "POST" action = "cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="album_search_input">Search For Album:</label><br>
-        <input type="text" id = "album_search_input" name = "album_search_input" size = "40">
+        <input type="text" id = "album_search_input" name = "album_search_input" size = "40">t
         <input type="submit" value="Search" name= album_search_submit>
     </p>
 </form>
 
-<form method = "POST" action = "cust_browse.php">
+<form method = "POST" action = "cust_browse.php?cust_email=<?php echo $email;?>">
     <p>
         <label for="artist_search_input">Search For Artist:</label><br>
         <input type="text" id = "artist_search_input" name = "artist_search_input" size = "40">
@@ -188,7 +192,7 @@ if ($db_conn) {
         printSongResult($result);
     } elseif (array_key_exists('album_search_submit', $_POST)) {
         // Retrieve input from Album Search
-        $result = executePlainSQL("select * from album WHERE name LIKE '%".$_POST[album_search_input]."%'");
+        $result = executePlainSQL("select * from album WHERE name LIKE '%".$_POST['album_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
     } elseif (array_key_exists('artist_search_submit', $_POST)) {
@@ -198,13 +202,10 @@ if ($db_conn) {
         printResult($result);
     }
     elseif (array_key_exists('cart_submit', $_POST)) {
-        // $stock = executePlainSQL("select stock from album where album_id = $_POST[cart_input]");
-        // if ($_POST[cart_quantity] <= stock {
         // Retrieve input from Artist Search
         $result = executePlainSQL("insert into cart values('".$_POST[email_cart_input]."', ".$_POST[cart_input].", ".$_POST[cart_quantity].")");
         OCICommit($db_conn);
         printConfirm();
-    //} else { print an error that quantity entered exceeded stock limit of $stock}
     }
     OCILogoff($db_conn);
 }
