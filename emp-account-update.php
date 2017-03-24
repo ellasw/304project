@@ -31,10 +31,49 @@
 <p><input type="submit" value="update account" name="UpdateCustAccount"></p>
 </form>
 
+<!-- 
 <p> <font size = "3" color = "red">Delete Existing Customer Account: </font> </p>
 <form method="POST" action="emp-account-update.php">
 <p> Customer email: <input type="text" name="CustEmailDel" size="24"></p>
 <p><input type="submit" value="delete account" name="DeleteCustAccount"></p>
+</form>
+ -->
+
+<p> <font size = 3 color = "medblue"> Add a new branch: </font> </p>
+<form method="POST" action="emp-account-update.php">
+<p> Branch #:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="number" name="BranchNo"></p>
+<p> Address: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" name="BranchAddress" size="30"></p>
+<p> City: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input type="text" name="BranchCity" size="20"></p>
+<p> Province:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+		<input type="text" name="BranchProv" size="5"></p>
+<p> Postal Code:&nbsp; 
+		<input type="text" name="BranchZip" size="10"></p>
+<p><input type="submit" value="add branch" name="AddBranch"></p>
+</form>
+
+
+<p> <font size = "3" color = "medblue">Edit Existing Branch: </font> </p>
+<form method="POST" action="emp-account-update.php">
+<p> Branch #: <input type="number" name="BranchNoUp"></p>
+<p> Information to update: </p>
+<p> New Address:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ 			<input type="text" name="NewBranchAddress" size="30"></p>
+<p> New City:		
+			<input type="text" name="NewBranchCity" size="20"></p>
+<p> New Province:
+			<input type="text" name="NewBranchProv" size="5"></p>
+<p> New Postal Code:
+			<input type="text" name="NewBranchZip" size="10"></p>
+<p><input type="submit" value="update branch" name="UpdateCustAccount"></p>
+</form>
+
+<p> <font size = "3" color = "red">Delete Existing Branch: </font> </p>
+<form method="POST" action="emp-account-update.php">
+<p> Branch #: <input type="number" name="BranchNoDel" size="24"></p>
+<p><input type="submit" value="delete branch" name="DeleteBranch"></p>
 </form>
 
 
@@ -134,7 +173,7 @@ function printEmployeeResult($result) {
         </tr>";
         
     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-     echo "<tr><td>" . $row["name"] . "</td><td>" . $row["emp_email"] . "</td><td>" . $row["password"] . "</td><td>" . $row["branch_no"] . "</td></tr>";
+     echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["EMP_EMAIL"] . "</td><td>" . $row["PASSWORD"] . "</td><td>" . $row["BRANCH_NO"] . "</td></tr>";
     }
     echo "</table>";
 
@@ -150,16 +189,26 @@ function printCustomer($result) { //prints results from a select statement
     echo "</table>";
 }
 
+function printBranch($result) {
+	echo "<p> Existing Branches:</p>";
+	echo "<table>";
+	echo "<tr><th>Branch #:</th><th>Address:</th><th>City:</th><th>Province:</th><th>Postal Code:</th></tr>";
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+        echo "<tr><td>" . $row["BRANCH_NO"] . "</td><td>" . $row["STREET_NO"] . "</td><td>" . $row["CITY"] . "</td><td>" . $row["PROVINCE"] . "</td><td>" . $row["POSTAL_CODE"] . "</td></tr>"; //or just use "echo $row[0]"
+    }
+    echo "</table>";
+}
+
 // Connect Oracle...
 if ($db_conn) {
-				$result = executePlainSQL("select * from customer");
-				printCustomer($result);
+// 				$result = executePlainSQL("select * from customer");
+// 				printCustomer($result);
+								$result = executePlainSQL("select * from branch");
+				printBranch($result);
 
-	//executePlainSQL("insert into branch values (5, '1234', 'city', 'prov', 'zip')";
 
-	//executePlainSQL("insert into branch_employee values ('e@mac.com', 'Frank', '123', 1)");
 // 	$result = executePlainSQL("select * from branch_employee");
-// 	printEmployeeResult($result);
+//  	printEmployeeResult($result);
 	
     if (array_key_exists('UpdateEmpAccount', $_POST)) {
 			$EmpEmail   = $_POST['EmpEmail'];
@@ -186,6 +235,7 @@ if ($db_conn) {
 			OCICommit($db_conn);
 			}
 			if (!empty($NewEmpBranch) && isset($NewEmpBranch)) { //update branch number 
+			//here should add check to see if given branchNo is in the database. If not list all the branch numbers that exist 
 			$tuple = array (
 				":bind1" => $_POST['EmpEmail'],
 				":bind2" => $_POST['NewEmpBranch'] 
@@ -197,30 +247,7 @@ if ($db_conn) {
 			$result = executePlainSQL("select * from branch_employee");
 			printEmployeeResult($result);
 		} 
-// 		else 
-// 		if (array_key_exists('DeleteEmpAccount', $_POST) {
-// 			$tuple = array (
-// 				":bind1" => $_POST['EmpEmailDel']
-// 			);
-// 			$alltuples = array ($tuple);
-// 			executeBoundSQL("delete from branch_employee where emp_email=:bind1", $alltuples);
-// 			$result = executePlainSQL("select * from branch_employee");
-// 			OCICommit($db_conn);
-// 			printEmployeeResult($result);
-// 
-// 		} 
-// 		else if (array_key_exists('UpdateCustAccount', $_POST)) {
-// 				$tuple = array (
-// 					":bind1" => $_POST['CustEmailUp'],
-// 					":bind2" => $_POST['NewCustName'],
-// 					":bind3" => $_POST['NewCustPass']
-// 					);
-// 				$alltuples = array ($tuple);
-// 				executeBoundSQL("update customer set cust_name=:bind2, cust_password=:bind3 where cust_email=:bind1", $alltuples);
-// 				OCICommit($db_conn);
-// 				$result = executePlainSQL("select * from customer");
-// 				printCustomer($result);
-// 		}
+
 		else if (array_key_exists('UpdateCustAccount', $_POST)) {
 					$CustEmailUp   = $_POST['CustEmailUp'];
 					$NewCustName = $_POST['NewCustName'];
@@ -246,8 +273,41 @@ if ($db_conn) {
 				$result = executePlainSQL("select * from customer");
 				printCustomer($result);
 
-
 				}
+				
+// 		else if (array_key_exists('DeleteEmpAccount', $_POST)) {
+// 		//delete employee account 
+// 		}
+				
+				
+		else if (array_key_exists('AddBranch', $_POST)) {
+				if (empty($_POST['BranchNo']) || empty($_POST['BranchAddress']) || empty($_POST['BranchCity']) || empty($_POST['BranchProv']) || empty($_POST['BranchZip'])) {
+				//error a field is empty 
+				} else {
+				$tuple = array (
+					":bind1" => $_POST['BranchNo'],
+					":bind2" => $_POST['BranchAddress'],
+					":bind3" => $_POST['BranchCity'],
+					":bind4" => $_POST['BranchProv'],
+					":bind5" => $_POST['BranchZip'] );
+				$alltuples = array ($tuple);
+				executeBoundSQL("insert into branch values (:bind1, :bind2, :bind3, :bind4, :bind5)", $alltuples);
+				OCICommit($db_conn);
+				$result = executePlainSQL("select * from branch");
+				printBranch($result);
+
+					}
+		}
+		
+		else if (array_key_exists('DeleteBranch', $_POST)) {
+				$tuple = array ( ":=bind1" => $_POST['BranchNoDel'] );
+				$alltuples = array ( $tuple );
+				executeBoundSQL("delete from branch where branch_no=:bind1", $alltuples);
+				OCICommit($db_conn);
+				$result = executePlainSQL("select * from branch");
+				printBranch($result);
+
+		}
 		
 		 
 // 		if($_POST && success){
