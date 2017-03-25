@@ -140,6 +140,11 @@ insert into customer
 insert into customer 
 	values ('rob@gmail.com', 'Rob', '123');
 
+insert into customer
+	values ('aurlin@gmail.com', 'Aurlin' , '123');
+
+
+
 	
 insert into album
 	values (1, 10, 300, 15.00, 2016, 'The Life of Pablo', 'Hip-Hop/Rap', 'Kanye West');
@@ -398,6 +403,8 @@ insert into makes_purchase
 
 insert into makes_purchase 
 	values (20, 'alex@gmail.com', 12, 2016);
+
+
 
 
 		
@@ -699,5 +706,75 @@ insert into branch_carries_album
 
 insert into branch_carries_album
 	values (4, 20);
+
+
+/*this is for the customer that has purchased every album*/
+
+insert into makes_purchase
+	values(21,'aurlin@gmail.com', 2,2017);
+
+insert into purchase_has_album
+	values (21,1,1);
+
+insert into purchase_has_album
+	values (21,2,1);
+
+insert into purchase_has_album
+	values (21,3,1);
+
+insert into purchase_has_album
+	values (21,4,1);
+
+insert into purchase_has_album
+	values (21,5,1);
+
+insert into purchase_has_album
+	values (21,6,1);
+
+insert into purchase_has_album
+	values (21,7,1);
+
+insert into purchase_has_album
+	values (21,8,1);
+
+insert into purchase_has_album
+	values (21,9,1);
+
+insert into purchase_has_album
+	values (21,10,1);
+
+insert into purchase_has_album
+	values (21,11,1);
+
+insert into purchase_has_album
+	values (21,12,1);
+
+insert into purchase_has_album
+	values (21,13,1);
+
+insert into purchase_has_album
+	values (21,14,1);
+
+insert into purchase_has_album
+	values (21,15,1);
+
+insert into purchase_has_album
+	values (21,16,1);
+
+insert into purchase_has_album
+	values (21,17,1);
+
+insert into purchase_has_album
+	values (21,18,1);
+
+insert into purchase_has_album
+	values (21,19,1);
+
+insert into purchase_has_album
+	values (21,20,1);
+
+
+
+
 
 
