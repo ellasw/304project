@@ -1,30 +1,24 @@
 
 /* avg cost of all albums
 */
-SELECT
-AVG(price)
-FROM 
-album
+SELECT AVG(price) FROM album;
 
 /*Nested aggregation (like last problem of midterm 2):
 group-by genre and find avg cost of the albums in that genre 
 */
-SELECT 
-AVG(price)
-FROM  album
-GROUP BY genre
+SELECT AVG(price) FROM album
+GROUP BY genre;
 
 /* select customers who have purchased all the albums
 */
-SELECT cust_email
-FROM customer
+SELECT c.cust_email FROM customer c
 WHERE NOT EXISTS (
-	SELECT *
-	FROM purchase_has_album
+	SELECT * FROM album a
 	WHERE NOT EXISTS(
-		select *
-		FROM makes_purchase
-		WHERE customer.cust_email=makes_purchase.cust_email AND ));
+		select * FROM makes_purchase m, purchase_has_album p
+		WHERE c.cust_email=m.cust_email 
+		AND m.purchase_no=p.purchase_no
+		AND a.album_id=p.album_id));
 
 
 

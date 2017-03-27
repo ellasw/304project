@@ -707,9 +707,6 @@ insert into branch_carries_album
 insert into branch_carries_album
 	values (4, 20);
 
-
-/*this is for the customer that has purchased every album*/
-
 insert into makes_purchase
 	values(21,'aurlin@gmail.com', 2,2017);
 
