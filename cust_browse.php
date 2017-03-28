@@ -184,15 +184,17 @@ if ($db_conn) {
     }elseif (array_key_exists('cart_submit', $_POST)) {
         // Retrieve input from Artist Search
         $quantity = $_POST['cart_quantity'];
-        $stock = executePlainSQL("select stock from album WHERE album_ID =".$_POST['album_ID']);
-        if ($quantity < $stock){
+        $stock = executePlainSQL("select stock AS s from album WHERE album_ID = ".$_POST['cart_input']);
+        $stockarray = OCI_Fetch_Array($stock, OCI_BOTH);
+        if ($quantity < $stockarray["S"]){
             $result = executePlainSQL("insert into cart values('".$_POST['email_cart_input']."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
             OCICommit($db_conn);
             printConfirm();
             header("location: cust_browse.php?cust_email=" . $email);
         }
         else{
-            echo "<br><br>Invalid Quantity. We currently do not carry ".$_POST['cart_quantity']." of those albums in our stock. Please select fewer copies.";
+            echo "<br><br>Invalid Quantity. We currently do not carry ".$_POST['cart_quantity']." copies of that albums in our stock. Please select fewer copies.";
+
         }
     }elseif (array_key_exists('cart', $_POST)){
         header("location: cart.php?cust_email=" . $email);
