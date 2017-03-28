@@ -104,6 +104,7 @@ function printSongResult($result) { //prints results from a select statement
 
 <form method="POST" action="emp_browse.php?emp_email=<?php echo $email;?>">
     <div align="right">
+		<input type="submit" value="Go To Edit Accounts" name="update_account"/>
         <input type="submit" value="Log Out" name="logout"/>
     </div>
 	
@@ -170,6 +171,8 @@ if ($db_conn) {
         $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
+	} elseif(array_key_exists('update_account', $_POST)){
+		header("location: emp-account-update.php?emp_email=" . $email);
 	}elseif (array_key_exists('logout', $_POST)){
 		header("location: mainlogin.php");
 	}elseif(array_key_exists('update_minstock', $_POST)){
