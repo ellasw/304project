@@ -150,6 +150,10 @@ function printSongResult($result) { //prints results from a select statement
 		<input type="submit" name="get_total_price_all_albums" value="Total Price of All Albums"/>
 		<input type="submit" name="get_avg_price_albums_by_genre" value="Average Prices of Each Genre"/>
 		<input type="submit" name="get_customers_bought_all" value="Customers Who Bought All Albums"/>
+		<input type="submit" name="get_min_price_album_by_genre" value="Minimum Price of Each Genre"/>
+		<input type="submit" name="get_max_price_album_by_genre" value="Maximum Price of Each Genre"/>
+		<input type="submit" name="get_count_of_all_albums" value="Count of All Albums"/>
+		<input type="submit" name="get_count_by_genre" value="Count of Albums of Each Genre"/>
 	</div>
 </form>
 
@@ -239,7 +243,15 @@ if ($db_conn) {
 		}
 		echo "</table><br/>Maximum Price of Albums: " . $maxprice["MAXPRICE"];
 		OCICommit($db_conn);
-		
+	}elseif(array_key_exists('get_count_of_all_albums', $_POST)){
+		$album = executePlainSQL("select album_id from album");
+		$count = OCI_Fetch_Array(executePlainSQL("select count(album_id) as count from album"), OCI_BOTH);
+		echo "<table><tr><th>Album ID</th></tr>";
+		while($row = OCI_Fetch_Array($album, OCI_BOTH)){
+			echo "<tr><td>" . $row['ALBUM_ID'] . "</td><td>" . $row['COUNT'] . "</td></tr>";
+		}
+		echo "</table><br/>Count of Albums: " . $count["COUNT"];
+		OCICommit($db_conn);
 	}elseif(array_key_exists('get_avg_price_all_albums', $_POST)){
 		$avgprice = OCI_Fetch_Array(executePlainSQL("select avg(price) as avgprice from album"), OCI_BOTH);
 		echo "Average Price of Albums: " . $avgprice["AVGPRICE"];
@@ -255,6 +267,22 @@ if ($db_conn) {
 		echo "<table><tr><th>Genre</th><th>Average Price of Genre</th><th>Total Price of Albums in Genre</th><th>Total Albums in Genre</th></tr>";
 		while($row = OCI_Fetch_Array($result, OCI_BOTH)){
 			echo "<tr><td>" . $row['GENRE'] . "</td><td>" . $row['AVGPRICE'] . "</td><td>" . $row['TOTALPRICE'] . "</td><td>" . $row['NUMINGENRE'] . "</td></tr>";
+		}
+		echo "</table>";
+		OCICommit($db_conn);
+	}elseif(array_key_exists('get_min_price_album_by_genre', $_POST)){
+		$result1 = executePlainSQL("select genre, min(price) as minprice, sum(price) as totalprice, count(*) as numingenre from album group by genre");
+		echo "<table><tr><th>Genre</th><th>Minimum Price of Genre</th><th>Total Price of Albums in Genre</th><th>Total Albums in Genre</th></tr>";
+		while($row = OCI_Fetch_Array($result1, OCI_BOTH)){
+			echo "<tr><td>" . $row['GENRE'] . "</td><td>" . $row['MINPRICE'] . "</td><td>" . $row['TOTALPRICE'] . "</td><td>" . $row['NUMINGENRE'] . "</td></tr>";
+		}
+		echo "</table>";
+		OCICommit($db_conn);
+		}elseif(array_key_exists('get_max_price_album_by_genre', $_POST)){
+		$result2 = executePlainSQL("select genre, max(price) as maxprice, sum(price) as totalprice, count(*) as numingenre from album group by genre");
+		echo "<table><tr><th>Genre</th><th>Maximum Price of Genre</th><th>Total Price of Albums in Genre</th><th>Total Albums in Genre</th></tr>";
+		while($row = OCI_Fetch_Array($result2, OCI_BOTH)){
+			echo "<tr><td>" . $row['GENRE'] . "</td><td>" . $row['MAXPRICE'] . "</td><td>" . $row['TOTALPRICE'] . "</td><td>" . $row['NUMINGENRE'] . "</td></tr>";
 		}
 		echo "</table>";
 		OCICommit($db_conn);
