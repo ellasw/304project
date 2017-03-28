@@ -146,6 +146,7 @@ function printSongResult($result) { //prints results from a select statement
 		<input type="submit" name="get_min_price_album" value="Cheapest Album"/>
 		<input type="submit" name="get_max_price_album" value="Most Expensive Album"/>
 		<input type="submit" name="get_avg_price_all_albums" value="Average Price of All Albums"/>
+		<input type="submit" name="get_total_price_all_albums" value="Total Price of All Albums"/>
 		<input type="submit" name="get_avg_price_albums_by_genre" value="Average Prices of Each Genre"/>
 		<input type="submit" name="get_customers_bought_all" value="Customers Who Bought All Albums"/>
 	</div>
@@ -171,6 +172,97 @@ if ($db_conn) {
         printResult($result);
 	}elseif (array_key_exists('logout', $_POST)){
 		header("location: mainlogin.php");
+	}elseif(array_key_exists('update_minstock', $_POST)){
+		$album_id = $_POST['album_to_update'];
+		$minstock = $_POST['minstock_to_update'];
+		if(!empty($album_id) && isset($album_id) && !empty($minstock) && isset($minstock)){
+			executePlainSQL("update album set minimum_stock=" . $minstock . " where album_id=" . $album_id);
+			OCICommit($db_conn);
+		}
+		else{
+			echo "Cannot update minstock. Please enter valid album_id and minstock";
+		}
+	}elseif(array_key_exists('update_stock', $_POST)){
+		$album_id = $_POST['album_to_update'];
+		$stock = $_POST['stock_to_update'];
+		if(!empty($album_id) && isset($album_id) && !empty($stock) && isset($stock)){
+			executePlainSQL("update album set stock=" . $stock . " where album_id=" . $album_id);
+			OCICommit($db_conn);
+		}
+		else{
+			echo "Cannot update stock. Please enter valid album_id and stock";
+		}
+	}elseif(array_key_exists('update_price', $_POST)){
+		$album_id = $_POST['album_to_update'];
+		$price = $_POST['price_to_update'];
+		if(!empty($album_id) && isset($album_id) && !empty($price) && isset($price)){
+			executePlainSQL("update album set price=" . $price . " where album_id=" . $album_id);
+			OCICommit($db_conn);
+		}
+		else{
+			echo "Cannot update price. Please enter valid album_id and price";
+		}
+	}elseif(array_key_exists('get_purchases', $_POST)){
+		$pmonth = $_POST['purchase_month'];
+		$pyear = $_POST['purchase_year'];
+		if(!empty($pmonth) && isset($pmonth) && !empty($pyear) && isset($pyear)){
+			$purchases = executePlainSQL("select m.purchase_no as pno, m.cust_email as email, m.purchase_month as month, m.purchase_year as year, p.album_id as album_id, p.quantity as quantity from makes_purchase m, purchase_has_album p where m.purchase_no=p.purchase_no and m.purchase_month=" . $pmonth . " and m.purchase_year=" . $pyear);
+			echo "<table><tr><th>Purchase No</th><th>Customer</th><th>Purchase Month</th><th>Purchase Year</th><th>Album ID</th><th>Quantity</th></tr>";
+			while($row = OCI_Fetch_Array($purchases, OCI_BOTH)){
+				echo "<tr><td>" . $row['PNO'] . "</td><td>" . $row['EMAIL'] . "</td><td>" . $row['MONTH'] . "</td><td>" . $row['YEAR'] . "</td><td>" . $row['ALBUM_ID'] . "</td><td>" . $row['QUANTITY'] . "</td></tr>";
+			}
+			echo "</table>";
+			OCICommit($db_conn);
+		}
+		else{
+			echo "Cannot get list of purchases. Please enter valid purchase month and year";
+		}
+	}elseif(array_key_exists('get_min_price_album', $_POST)){
+		$album = executePlainSQL("select album_id, price from album where price <= (select min(price) from album)");
+		$minprice = OCI_Fetch_Array(executePlainSQL("select min(price) as minprice from album"), OCI_BOTH);
+		echo "<table><tr><th>Album ID</th><th>Price</th></tr>";
+		while($row = OCI_Fetch_Array($album, OCI_BOTH)){
+			echo "<tr><td>" . $row['ALBUM_ID'] . "</td><td>" . $row['PRICE'] . "</td></tr>";
+		}
+		echo "</table><br/>Minimum Price of Albums: " . $minprice["MINPRICE"];
+		OCICommit($db_conn);
+		
+	}elseif(array_key_exists('get_max_price_album', $_POST)){
+		$album = executePlainSQL("select album_id, price from album where price >= (select max(price) from album)");
+		$maxprice = OCI_Fetch_Array(executePlainSQL("select max(price) as maxprice from album"), OCI_BOTH);
+		echo "<table><tr><th>Album ID</th><th>Price</th></tr>";
+		while($row = OCI_Fetch_Array($album, OCI_BOTH)){
+			echo "<tr><td>" . $row['ALBUM_ID'] . "</td><td>" . $row['PRICE'] . "</td></tr>";
+		}
+		echo "</table><br/>Maximum Price of Albums: " . $maxprice["MAXPRICE"];
+		OCICommit($db_conn);
+		
+	}elseif(array_key_exists('get_avg_price_all_albums', $_POST)){
+		$avgprice = OCI_Fetch_Array(executePlainSQL("select avg(price) as avgprice from album"), OCI_BOTH);
+		echo "Average Price of Albums: " . $avgprice["AVGPRICE"];
+		OCICommit($db_conn);
+		
+	}elseif(array_key_exists('get_total_price_all_albums', $_POST)){
+		$totalprice = OCI_Fetch_Array(executePlainSQL("select sum(price) as totalprice from album"), OCI_BOTH);
+		echo "Total Price of Albums: " . $totalprice["TOTALPRICE"];
+		OCICommit($db_conn);
+		
+	}elseif(array_key_exists('get_avg_price_albums_by_genre', $_POST)){
+		$result = executePlainSQL("select genre, avg(price) as avgprice, sum(price) as totalprice, count(*) as numingenre from album group by genre");
+		echo "<table><tr><th>Genre</th><th>Average Price of Genre</th><th>Total Price of Albums in Genre</th><th>Total Albums in Genre</th></tr>";
+		while($row = OCI_Fetch_Array($result, OCI_BOTH)){
+			echo "<tr><td>" . $row['GENRE'] . "</td><td>" . $row['AVGPRICE'] . "</td><td>" . $row['TOTALPRICE'] . "</td><td>" . $row['NUMINGENRE'] . "</td></tr>";
+		}
+		echo "</table>";
+		OCICommit($db_conn);
+	}elseif(array_key_exists('get_customers_bought_all', $_POST)){
+		$result = executePlainSQL("SELECT c.cust_email as cust_email FROM customer c WHERE NOT EXISTS (SELECT * FROM album a WHERE NOT EXISTS (select * FROM makes_purchase m, purchase_has_album p WHERE c.cust_email=m.cust_email AND m.purchase_no=p.purchase_no AND a.album_id=p.album_id))");
+		echo "<table><tr><th>Customer</th></tr>";
+		while($row = OCI_Fetch_Array($result, OCI_BOTH)){
+			echo "<tr><td>" . $row['CUST_EMAIL'] . "</td></tr>";
+		}
+		echo "</table>";
+		OCICommit($db_conn);
 	}
     OCILogoff($db_conn);
 }
