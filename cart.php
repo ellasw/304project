@@ -131,6 +131,9 @@ if ($db_conn) {
 				":bind1" => $row["ALBUM_ID"],
 				":bind2" => $row["QUANTITY"]
 			));
+			$old_stock = OCI_Fetch_Array(executePlainSQL("select stock from album where album_id=" . $row['ALBUM_ID']), OCI_BOTH);
+			$new_stock = $old_stock['STOCK'] - $row['QUANTITY'];
+			executePlainSQL("update album set stock=" . $new_stock . " where album_id=" . $row['ALBUM_ID']);
 		}
 		
 		$purchaseentry = array (
