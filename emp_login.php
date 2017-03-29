@@ -138,8 +138,7 @@ if ($db_conn) {
 
         if ($_POST && $success) {
             //POST-REDIRECT-GET -- See http://en.wikipedia.org/wiki/Post/Redirect/Get
-            header("location: http://www.ugrad.cs.ubc.ca/~t1m8/emp_login.php");
-            echo "Account Created Successfully.";
+            header("location: create_acc_confirm.php");
         } else {
             // Select data...
             $result = executePlainSQL("select * from branch_employee");

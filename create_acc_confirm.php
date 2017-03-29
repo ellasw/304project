@@ -8,5 +8,5 @@
 </header>
 
 <br>
-<a style="color:blue;"href="http://www.ugrad.cs.ubc.ca/~j2c0b/mainlogin.php">Login Now</a>
+<a style="color:blue;" href="mainlogin.php">Login Now</a>
 <br>

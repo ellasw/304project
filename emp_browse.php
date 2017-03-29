@@ -123,6 +123,16 @@ function printSongResult($result) { //prints results from a select statement
         <input type="text" id="artist_search_input" name="artist_search_input" size="40">
         <input type="submit" value="Search" name="artist_search_submit">
     </div>
+	<div id="search_by_year">
+        <label for="album_year_input">Search For Album By Year:</label><br>
+        <input type="text" id="album_year_input" name="album_year" size="40">
+        <input type="submit" value="Search" name="search_by_year">
+    </div>
+	<div id="search_by_genre">
+        <label for="album_genre_input">Search For Album By Genre:</label><br>
+        <input type="text" id="album_genre_input" name="album_genre" size="40">
+        <input type="submit" value="Search" name="search_by_genre">
+    </div>
 	
 	<h3>Update Albums</h3>
 	<div id="update_albums">
@@ -153,7 +163,6 @@ function printSongResult($result) { //prints results from a select statement
 		<input type="submit" name="get_min_price_album_by_genre" value="Minimum Price of Each Genre"/>
 		<input type="submit" name="get_max_price_album_by_genre" value="Maximum Price of Each Genre"/>
 		<input type="submit" name="get_count_of_all_albums" value="Count of All Albums"/>
-		<input type="submit" name="get_count_by_genre" value="Count of Albums of Each Genre"/>
 	</div>
 </form>
 
@@ -175,7 +184,15 @@ if ($db_conn) {
         $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
-	} elseif(array_key_exists('update_account', $_POST)){
+	} elseif (array_key_exists('search_by_year', $_POST)) {
+        $result = executePlainSQL("select * from album WHERE year=" . $_POST['album_year']);
+        OCICommit($db_conn);
+        printResult($result);
+    } elseif (array_key_exists('search_by_genre', $_POST)) {
+        $result = executePlainSQL("select * from album WHERE genre LIKE '%" . $_POST['album_genre'] . "%'");
+        OCICommit($db_conn);
+        printResult($result);
+    } elseif(array_key_exists('update_account', $_POST)){
 		header("location: emp-account-update.php?emp_email=" . $email);
 	}elseif (array_key_exists('logout', $_POST)){
 		header("location: mainlogin.php");
@@ -244,13 +261,8 @@ if ($db_conn) {
 		echo "</table><br/>Maximum Price of Albums: " . $maxprice["MAXPRICE"];
 		OCICommit($db_conn);
 	}elseif(array_key_exists('get_count_of_all_albums', $_POST)){
-		$album = executePlainSQL("select album_id from album");
-		$count = OCI_Fetch_Array(executePlainSQL("select count(album_id) as count from album"), OCI_BOTH);
-		echo "<table><tr><th>Album ID</th></tr>";
-		while($row = OCI_Fetch_Array($album, OCI_BOTH)){
-			echo "<tr><td>" . $row['ALBUM_ID'] . "</td><td>" . $row['COUNT'] . "</td></tr>";
-		}
-		echo "</table><br/>Count of Albums: " . $count["COUNT"];
+		$count = OCI_Fetch_Array(executePlainSQL("select count(*) as count from album"), OCI_BOTH);
+		echo "Total Number of Albums: " . $count["COUNT"];
 		OCICommit($db_conn);
 	}elseif(array_key_exists('get_avg_price_all_albums', $_POST)){
 		$avgprice = OCI_Fetch_Array(executePlainSQL("select avg(price) as avgprice from album"), OCI_BOTH);

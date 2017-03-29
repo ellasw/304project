@@ -45,7 +45,7 @@
 
 <?php
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-$db_conn = OCILogon("ora_a2v9a", "a17792145", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
+$db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
     //echo "<br>running ".$cmdstr."<br>";
     global $db_conn, $success;
@@ -122,7 +122,7 @@ if ($db_conn) {
         executeBoundSQL("insert into customer values (:bind2, :bind1, :bind3)", $alltuples);
         OCICommit($db_conn);
         if ($_POST && $success) {
-            header("location: http://www.ugrad.cs.ubc.ca/~a2v9a/create_acc_confirm.php");
+            header("location: create_acc_confirm.php");
         } else {
 			echo "An account with the given email already exists. Please Login.";
             $result = executePlainSQL("select * from customer");
@@ -136,7 +136,7 @@ if ($db_conn) {
         $result = executePlainSQL("select Count(*) AS cemail from customer WHERE cust_email = '".$_POST['cust_email']."' AND cust_password = '".$_POST['cust_password']."'");
         $resultarray = OCI_Fetch_Array($result, OCI_BOTH);
         if ($resultarray["CEMAIL"] > 0){
-            header("location: http://www.ugrad.cs.ubc.ca/~a2v9a/cust_browse.php?cust_email=" . $_POST['cust_email']);
+            header("location: cust_browse.php?cust_email=" . $_POST['cust_email']);
             exit;
 		}
         else{

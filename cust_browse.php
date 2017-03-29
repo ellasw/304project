@@ -49,6 +49,16 @@ $email = $_GET['cust_email'];
             <input type="text" id = "artist_search_input" name = "artist_search_input" size = "40">
             <input type="submit" value="Search" name= "artist_search_submit">
         </p>
+		<div id="search_by_year">
+			<label for="album_year_input">Search For Album By Year:</label><br>
+			<input type="text" id="album_year_input" name="album_year" size="40">
+			<input type="submit" value="Search" name="search_by_year">
+		</div>
+		<div id="search_by_genre">
+			<label for="album_genre_input">Search For Album By Genre:</label><br>
+			<input type="text" id="album_genre_input" name="album_genre" size="40">
+			<input type="submit" value="Search" name="search_by_genre">
+		</div>
     </form>
 
     <br>
@@ -58,9 +68,6 @@ $email = $_GET['cust_email'];
         <p>
             <label for="cart_input">AlbumID</label><br>
             <input type="number" id = "cart_input" name = "cart_input" size = "15"><br>
-
-            <label for="email_cart_input">Email</label><br>
-            <input type="email" id = "email_cart_input" name = "email_cart_input" size = "50"><br>
 
             <label for="cart_quantity">Quantity</label><br>
             <input type="number" id = "cart_quantity" name = "cart_quantity" size = "15"><br>
@@ -72,7 +79,7 @@ $email = $_GET['cust_email'];
 //this tells the system that it's no longer just parsing
 //html; it's now parsing PHP
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-$db_conn = OCILogon("ora_j2c0b", "a46509148", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
+$db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
     //echo "<br>running ".$cmdstr."<br>";
     global $db_conn, $success;
@@ -181,13 +188,21 @@ if ($db_conn) {
         $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
-    }elseif (array_key_exists('cart_submit', $_POST)) {
+    }elseif (array_key_exists('search_by_year', $_POST)) {
+        $result = executePlainSQL("select * from album WHERE year=" . $_POST['album_year']);
+        OCICommit($db_conn);
+        printResult($result);
+    } elseif (array_key_exists('search_by_genre', $_POST)) {
+        $result = executePlainSQL("select * from album WHERE genre LIKE '%" . $_POST['album_genre'] . "%'");
+        OCICommit($db_conn);
+        printResult($result);
+    } elseif (array_key_exists('cart_submit', $_POST)) {
         // Retrieve input from Artist Search
         $quantity = $_POST['cart_quantity'];
         $stock = executePlainSQL("select stock AS s from album WHERE album_ID = ".$_POST['cart_input']);
         $stockarray = OCI_Fetch_Array($stock, OCI_BOTH);
         if ($quantity < $stockarray["S"]){
-            $result = executePlainSQL("insert into cart values('".$_POST['email_cart_input']."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
+            $result = executePlainSQL("insert into cart values('".$email."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
             OCICommit($db_conn);
             printConfirm();
             header("location: cust_browse.php?cust_email=" . $email);
