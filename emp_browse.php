@@ -1,19 +1,16 @@
 <?php 
 $email = $_GET['emp_email'];
 $success = True;
-$db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
-
+$db_conn = OCILogon("ora_a2v9a", "a17792145", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 function executePlainSQL($cmdstr) {
     global $db_conn, $success;
     $statement = OCIParse($db_conn, $cmdstr); 
-
     if (!$statement) {
         echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
         $e = OCI_Error($db_conn);
         echo htmlentities($e['message']);
         $success = False;
     }
-
     $r = OCIExecute($statement, OCI_DEFAULT);
     if (!$r) {
         echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
@@ -21,22 +18,18 @@ function executePlainSQL($cmdstr) {
         echo htmlentities($e['message']);
         $success = False;
     } else {
-
     }
     return $statement;
 }
-
 function executeBoundSQL($cmdstr, $list) {
     global $db_conn, $success;
     $statement = OCIParse($db_conn, $cmdstr);
-
     if (!$statement) {
         echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
         $e = OCI_Error($db_conn);
         echo htmlentities($e['message']);
         $success = False;
     }
-
     foreach ($list as $tuple) {
         foreach ($tuple as $bind => $val) {
             OCIBindByName($statement, $bind, $val);
@@ -44,15 +37,14 @@ function executeBoundSQL($cmdstr, $list) {
 		}
         $r = OCIExecute($statement, OCI_DEFAULT);
         if (!$r) {
-            echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
+            //echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
             $e = OCI_Error($statement); // For OCIExecute errors pass the statementhandle
-            echo htmlentities($e['message']);
-            echo "<br>";
+            //echo htmlentities($e['message']);
+//             echo "<br>";
             $success = False;
         }
     }
 }
-
 function printResult($result) { //prints results from a select statement
     echo "<p style='font-size: x-large'>Results From Your Search:</p>";
     echo "<table>";
@@ -66,13 +58,11 @@ function printResult($result) { //prints results from a select statement
             <th>Genre:</th>
             <th>Artist:</th>
         </tr>";
-
     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
         echo "<tr><td>" . $row["ALBUM_ID"] . "</td><td>" . $row["MINIMUM_STOCK"] . "</td><td>" . $row["STOCK"] . "</td><td>" . $row["PRICE"] . "</td><td>" . $row["YEAR"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["GENRE"] . "</td><td>" . $row["ARTIST"] . "</td></tr>";
     }
     echo "</table>";
 }
-
 function printSongResult($result) { //prints results from a select statement
     echo "<p style='font-size: x-large'>Results From Your Search:</p>";
     echo "<table>";
@@ -85,12 +75,36 @@ function printSongResult($result) { //prints results from a select statement
             <th>Song ID:</th>
             <th>Song Title:</th>
         </tr>";
-
     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
         echo "<tr><td>" . $row["ALBUM_ID"] . "</td><td>" . $row["YEAR"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["GENRE"] . "</td><td>" . $row["ARTIST"] . "</td><td>" . $row["SONG_ID"] . "</td><td>" . $row["SONG_TITLE"] . "</td></tr>";
     }
     echo "</table>";
 }
+function printAlbum($result) { //prints results from a select statement
+    echo "<p style='font-size: x-large'>Results From Your Search:</p>";
+    echo "<table>";
+    echo "<tr>
+            <th>AlbumID:</th>
+            <th>Minimum Stock:</th>
+            <th>Stock:</th>
+            <th>Price:</th>
+            <th>Year:</th>
+            <th>Name:</th>
+            <th>Genre:</th>
+            <th>Artist:</th>
+        </tr>";
+    while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+        echo "<tr><td>" . $row["ALBUM_ID"] . "</td><td>" . $row["MINIMUM_STOCK"] . "</td><td>" . $row["STOCK"] . "</td><td>" . $row["PRICE"] . "</td><td>" . $row["YEAR"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["GENRE"] . "</td><td>" . $row["ARTIST"] . "</td></tr>";
+    }
+    echo "</table>";
+}
+function printEmptyError() {
+	echo "<p style='font-size: x-large'>To add an album, all fields must be completed </p>";
+}
+
+function printInputError() {
+	echo "<p style='font-size: x-large'>Album ID, Stock, Minimum Stock, Year and Price must be numbers.</p>";
+	}
 ?>
 
 <head>
@@ -134,6 +148,19 @@ function printSongResult($result) { //prints results from a select statement
         <input type="submit" value="Search" name="search_by_genre">
     </div>
 	
+		<h3>Add Album </h3>
+	<form method="POST" action="emp_browse.php">
+	<p> Album ID: <input type="number" name="AlbumID"></p>
+	<p> Album Name: <input type="text" name="AlbumName"></p>
+	<p> Genre: <input type="text" name="AlbumGenre"></p>
+	<p> Artist: <input type="text" name="AlbumArtist"></p>
+	<p> Price: <input type="float" name="AlbumPrice" min="0"></p>
+	<p> Year: <input type="number" name="AlbumYear" max="2017"></p>
+	<p> Stock: <input type="number" name="AlbumStock" min="0"></p>
+	<p> Minimum Stock: <input type="number" name="AlbumMinStock" min="0"></p>
+        <input type="submit" value="Add Album" name="AddAlbum">
+</form>
+
 	<h3>Update Albums</h3>
 	<div id="update_albums">
 		Album ID:<input type="text" name="album_to_update" size="3"/><br/>
@@ -144,6 +171,13 @@ function printSongResult($result) { //prints results from a select statement
 		Update Album Price:<input type="text" name="price_to_update"/>
 		<input type="submit" name="update_price" value="Update Price"/>
 	</div>
+	
+		<h3>Delete Album</h3>
+	<form method="POST" action="emp_browse.php">
+	<p> Album ID: <input type="number" name="AlbumID"></p>
+	<input type="submit" value="Delete Album" name="DeleteAlbum">
+	</form>
+
 	
 	<h3>List of Purchases</h3>
 	<div id="list_purchases">
@@ -174,29 +208,36 @@ if ($db_conn) {
         $result = executePlainSQL("SELECT album_has_song.song_id, album_has_song.song_title, album.album_id, album.name, album.artist, album.genre, album.year FROM album INNER JOIN album_has_song ON album.album_id=album_has_song.album_id AND album_has_song.song_title LIKE '%".$_POST['song_search_input']."%' ORDER BY album.artist");
         OCICommit($db_conn);
         printSongResult($result);
-    } elseif (array_key_exists('album_search_submit', $_POST)) {
+    } 
+    elseif (array_key_exists('album_search_submit', $_POST)) {
         // Retrieve input from Album Search
         $result = executePlainSQL("select * from album WHERE name LIKE '%".$_POST['album_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
-    } elseif (array_key_exists('artist_search_submit', $_POST)) {
+    } 
+    elseif (array_key_exists('artist_search_submit', $_POST)) {
         // Retrieve input from Artist Search
         $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
-	} elseif (array_key_exists('search_by_year', $_POST)) {
+	} 
+	elseif (array_key_exists('search_by_year', $_POST)) {
         $result = executePlainSQL("select * from album WHERE year=" . $_POST['album_year']);
         OCICommit($db_conn);
         printResult($result);
-    } elseif (array_key_exists('search_by_genre', $_POST)) {
+    } 
+    elseif (array_key_exists('search_by_genre', $_POST)) {
         $result = executePlainSQL("select * from album WHERE genre LIKE '%" . $_POST['album_genre'] . "%'");
         OCICommit($db_conn);
         printResult($result);
-    } elseif(array_key_exists('update_account', $_POST)){
+    } 
+    elseif(array_key_exists('update_account', $_POST)){
 		header("location: emp-account-update.php?emp_email=" . $email);
-	}elseif (array_key_exists('logout', $_POST)){
+	}
+	elseif (array_key_exists('logout', $_POST)){
 		header("location: mainlogin.php");
-	}elseif(array_key_exists('update_minstock', $_POST)){
+	}
+	elseif(array_key_exists('update_minstock', $_POST)){
 		$album_id = $_POST['album_to_update'];
 		$minstock = $_POST['minstock_to_update'];
 		if(!empty($album_id) && isset($album_id) && !empty($minstock) && isset($minstock)){
@@ -206,7 +247,8 @@ if ($db_conn) {
 		else{
 			echo "Cannot update minstock. Please enter valid album_id and minstock";
 		}
-	}elseif(array_key_exists('update_stock', $_POST)){
+	}
+	elseif(array_key_exists('update_stock', $_POST)){
 		$album_id = $_POST['album_to_update'];
 		$stock = $_POST['stock_to_update'];
 		if(!empty($album_id) && isset($album_id) && !empty($stock) && isset($stock)){
@@ -216,7 +258,8 @@ if ($db_conn) {
 		else{
 			echo "Cannot update stock. Please enter valid album_id and stock";
 		}
-	}elseif(array_key_exists('update_price', $_POST)){
+	}
+	elseif(array_key_exists('update_price', $_POST)){
 		$album_id = $_POST['album_to_update'];
 		$price = $_POST['price_to_update'];
 		if(!empty($album_id) && isset($album_id) && !empty($price) && isset($price)){
@@ -226,7 +269,8 @@ if ($db_conn) {
 		else{
 			echo "Cannot update price. Please enter valid album_id and price";
 		}
-	}elseif(array_key_exists('get_purchases', $_POST)){
+	}
+	elseif(array_key_exists('get_purchases', $_POST)){
 		$pmonth = $_POST['purchase_month'];
 		$pyear = $_POST['purchase_year'];
 		if(!empty($pmonth) && isset($pmonth) && !empty($pyear) && isset($pyear)){
@@ -241,7 +285,8 @@ if ($db_conn) {
 		else{
 			echo "Cannot get list of purchases. Please enter valid purchase month and year";
 		}
-	}elseif(array_key_exists('get_min_price_album', $_POST)){
+	}
+	elseif(array_key_exists('get_min_price_album', $_POST)){
 		$album = executePlainSQL("select album_id, price from album where price <= (select min(price) from album)");
 		$minprice = OCI_Fetch_Array(executePlainSQL("select min(price) as minprice from album"), OCI_BOTH);
 		echo "<table><tr><th>Album ID</th><th>Price</th></tr>";
@@ -251,7 +296,8 @@ if ($db_conn) {
 		echo "</table><br/>Minimum Price of Albums: " . $minprice["MINPRICE"];
 		OCICommit($db_conn);
 		
-	}elseif(array_key_exists('get_max_price_album', $_POST)){
+	}
+	elseif(array_key_exists('get_max_price_album', $_POST)){
 		$album = executePlainSQL("select album_id, price from album where price >= (select max(price) from album)");
 		$maxprice = OCI_Fetch_Array(executePlainSQL("select max(price) as maxprice from album"), OCI_BOTH);
 		echo "<table><tr><th>Album ID</th><th>Price</th></tr>";
@@ -260,21 +306,25 @@ if ($db_conn) {
 		}
 		echo "</table><br/>Maximum Price of Albums: " . $maxprice["MAXPRICE"];
 		OCICommit($db_conn);
-	}elseif(array_key_exists('get_count_of_all_albums', $_POST)){
+	}
+	elseif(array_key_exists('get_count_of_all_albums', $_POST)){
 		$count = OCI_Fetch_Array(executePlainSQL("select count(*) as count from album"), OCI_BOTH);
 		echo "Total Number of Albums: " . $count["COUNT"];
 		OCICommit($db_conn);
-	}elseif(array_key_exists('get_avg_price_all_albums', $_POST)){
+	}
+	elseif(array_key_exists('get_avg_price_all_albums', $_POST)){
 		$avgprice = OCI_Fetch_Array(executePlainSQL("select avg(price) as avgprice from album"), OCI_BOTH);
 		echo "Average Price of Albums: " . $avgprice["AVGPRICE"];
 		OCICommit($db_conn);
 		
-	}elseif(array_key_exists('get_total_price_all_albums', $_POST)){
+	}
+	elseif(array_key_exists('get_total_price_all_albums', $_POST)){
 		$totalprice = OCI_Fetch_Array(executePlainSQL("select sum(price) as totalprice from album"), OCI_BOTH);
 		echo "Total Price of Albums: " . $totalprice["TOTALPRICE"];
 		OCICommit($db_conn);
 		
-	}elseif(array_key_exists('get_avg_price_albums_by_genre', $_POST)){
+	}
+	elseif(array_key_exists('get_avg_price_albums_by_genre', $_POST)){
 		$result = executePlainSQL("select genre, avg(price) as avgprice, sum(price) as totalprice, count(*) as numingenre from album group by genre");
 		echo "<table><tr><th>Genre</th><th>Average Price of Genre</th><th>Total Price of Albums in Genre</th><th>Total Albums in Genre</th></tr>";
 		while($row = OCI_Fetch_Array($result, OCI_BOTH)){
@@ -282,7 +332,8 @@ if ($db_conn) {
 		}
 		echo "</table>";
 		OCICommit($db_conn);
-	}elseif(array_key_exists('get_min_price_album_by_genre', $_POST)){
+	}
+	elseif(array_key_exists('get_min_price_album_by_genre', $_POST)){
 		$result1 = executePlainSQL("select genre, min(price) as minprice, sum(price) as totalprice, count(*) as numingenre from album group by genre");
 		echo "<table><tr><th>Genre</th><th>Minimum Price of Genre</th><th>Total Price of Albums in Genre</th><th>Total Albums in Genre</th></tr>";
 		while($row = OCI_Fetch_Array($result1, OCI_BOTH)){
@@ -290,7 +341,8 @@ if ($db_conn) {
 		}
 		echo "</table>";
 		OCICommit($db_conn);
-		}elseif(array_key_exists('get_max_price_album_by_genre', $_POST)){
+		}
+	elseif(array_key_exists('get_max_price_album_by_genre', $_POST)){
 		$result2 = executePlainSQL("select genre, max(price) as maxprice, sum(price) as totalprice, count(*) as numingenre from album group by genre");
 		echo "<table><tr><th>Genre</th><th>Maximum Price of Genre</th><th>Total Price of Albums in Genre</th><th>Total Albums in Genre</th></tr>";
 		while($row = OCI_Fetch_Array($result2, OCI_BOTH)){
@@ -298,7 +350,8 @@ if ($db_conn) {
 		}
 		echo "</table>";
 		OCICommit($db_conn);
-	}elseif(array_key_exists('get_customers_bought_all', $_POST)){
+	}
+	elseif(array_key_exists('get_customers_bought_all', $_POST)){
 		$result = executePlainSQL("SELECT c.cust_email as cust_email FROM customer c WHERE NOT EXISTS (SELECT * FROM album a WHERE NOT EXISTS (select * FROM makes_purchase m, purchase_has_album p WHERE c.cust_email=m.cust_email AND m.purchase_no=p.purchase_no AND a.album_id=p.album_id))");
 		echo "<table><tr><th>Customer</th></tr>";
 		while($row = OCI_Fetch_Array($result, OCI_BOTH)){
@@ -307,13 +360,77 @@ if ($db_conn) {
 		echo "</table>";
 		OCICommit($db_conn);
 	}
+	else if (array_key_exists('AddAlbum', $_POST)) {
+		$AlbumID 	   = $_POST['AlbumID'];
+		$AlbumMinStock = $_POST['AlbumMinStock'];
+		$AlbumStock    = $_POST['AlbumStock'];
+		$AlbumPrice    = $_POST['AlbumPrice'];
+		$AlbumYear     = $_POST['AlbumYear'];
+		$AlbumName     = $_POST['AlbumName'];
+		$AlbumGenre    = $_POST['AlbumGenre'];
+		$AlbumArtist   = $_POST['AlbumArtist'];
+		if (!(is_numeric($AlbumID) && is_numeric($AlbumMinStock) && is_numeric($AlbumStock) && is_numeric($AlbumYear) && is_numeric($AlbumPrice))) {
+			printInputError();
+            	$result = executePlainSQL("select * from album order by album_id");
+            	printAlbum($result);
+
+		} else if (empty($AlbumID) || empty($AlbumMinStock) || empty($AlbumStock) || empty($AlbumPrice) || empty($AlbumYear) || empty($AlbumName) || empty($AlbumGenre) || empty($AlbumArtist)) {
+			printEmptyError();
+            	$result = executePlainSQL("select * from album order by album_id");
+            	printAlbum($result);
+		} 
+		else {
+		//if there is already an album with that ID give an error and print all the albums with their IDs 
+			$tuple = array ( 
+				":bind1" => $AlbumID,
+				":bind2" => $AlbumMinStock,
+				":bind3" => $AlbumStock,
+				":bind4" => $AlbumPrice,
+				":bind5" => $AlbumYear,
+				":bind6" => $AlbumName,
+				":bind7" => $AlbumGenre,
+				":bind8" => $AlbumArtist
+			);
+			$alltuples = array ($tuple);
+			executeBoundSQL("insert into album values(:bind1, :bind2, :bind3, :bind4, :bind5, :bind6, :bind7, :bind8)", $alltuples);
+			OCICommit($db_conn);
+			if ($_POST && $success) {
+            	echo "<p style='font-size: x-large'>Album added.</p>";
+            	$result = executePlainSQL("select * from album order by album_id");
+            	printAlbum($result);
+
+       		 } else {
+				echo "<p style='font-size: x-large'>Failed to add album.</p>";
+            	$result = executePlainSQL("select * from album order by album_id");
+            	printAlbum($result);
+        }
+		}
+	}
+	else if (array_key_exists('DeleteAlbum', $_POST)) {
+		$tuple = array (
+			":bind1" => $_POST['AlbumID']
+		);
+		$alltuples = array ($tuple);
+		executeBoundSQL("delete from album where album_id=:bind1", $alltuples);
+		OCICommit($db_conn);
+		// if there isn't an album with that ID give error 
+		if ($_POST && $success) {
+		        echo "<p style='font-size: x-large'>Album deleted.</p>";
+            	$result = executePlainSQL("select * from album order by album_id");
+            	printAlbum($result);
+
+		} else { 
+				echo "<p style='font-size: x-large'>Failed to delete album.</p>";
+            	$result = executePlainSQL("select * from album order by album_id");
+            	printAlbum($result);
+		}
+		}
+
     OCILogoff($db_conn);
 }
-
 else {
     echo "CANNOT CONNECT. CONNECTION NONEXISTENT.";
     $e = OCI_Error(); // For OCILogon errors pass no handle
     echo htmlentities($e['message']);
-
 }
 ?>
