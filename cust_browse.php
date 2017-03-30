@@ -168,7 +168,7 @@ function printSongResult($result) { //prints results from a select statement
     echo "</table>";
 }
 function printConfirm() { //prints results from a select statement
-    echo "Item added to Cart";
+    echo "<p style='font-size: large'>Item added to Cart.</p>";
 }
 // Connect Oracle...
 if ($db_conn) {
@@ -200,11 +200,11 @@ if ($db_conn) {
         $quantity = $_POST['cart_quantity'];
         $stock = executePlainSQL("select stock AS s from album WHERE album_ID = ".$_POST['cart_input']);
         $stockarray = OCI_Fetch_Array($stock, OCI_BOTH);
-        if ($quantity < $stockarray["S"]){
+        if ($quantity <= $stockarray["S"]){
             $result = executePlainSQL("insert into cart values('".$email."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
             OCICommit($db_conn);
             printConfirm();
-            header("location: cust_browse.php?cust_email=" . $email);
+            //header("location: cust_browse.php?cust_email=" . $email);
         }
         else{
             echo "<br><br>Invalid Quantity. We currently do not carry ".$_POST['cart_quantity']." copies of that albums in our stock. Please select fewer copies.";
