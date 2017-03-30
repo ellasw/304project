@@ -54,6 +54,7 @@ $email = $_GET['cust_email'];
 			<input type="text" id="album_year_input" name="album_year" size="40">
 			<input type="submit" value="Search" name="search_by_year">
 		</div>
+		<br>
 		<div id="search_by_genre">
 			<label for="album_genre_input">Search For Album By Genre:</label><br>
 			<input type="text" id="album_genre_input" name="album_genre" size="40">
@@ -79,7 +80,7 @@ $email = $_GET['cust_email'];
 //this tells the system that it's no longer just parsing
 //html; it's now parsing PHP
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-$db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
+$db_conn = OCILogon("ora_a2v9a", "a17792145", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
     //echo "<br>running ".$cmdstr."<br>";
     global $db_conn, $success;
@@ -137,7 +138,6 @@ function printResult($result) { //prints results from a select statement
     echo "<table>";
     echo "<tr>
             <th>AlbumID:</th>
-            <th>Minimum Stock:</th>
             <th>Stock:</th>
             <th>Price:</th>
             <th>Year:</th>
@@ -146,7 +146,7 @@ function printResult($result) { //prints results from a select statement
             <th>Artist:</th>
         </tr>";
     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-        echo "<tr><td>" . $row["ALBUM_ID"] . "</td><td>" . $row["MINIMUM_STOCK"] . "</td><td>" . $row["STOCK"] . "</td><td>" . $row["PRICE"] . "</td><td>" . $row["YEAR"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["GENRE"] . "</td><td>" . $row["ARTIST"] . "</td></tr>";
+        echo "<tr><td>" . $row["ALBUM_ID"] . "</td><td>" . $row["STOCK"] . "</td><td>" . $row["PRICE"] . "</td><td>" . $row["YEAR"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["GENRE"] . "</td><td>" . $row["ARTIST"] . "</td></tr>";
     }
     echo "</table>";
 }
@@ -197,7 +197,6 @@ if ($db_conn) {
         OCICommit($db_conn);
         printResult($result);
     } elseif (array_key_exists('cart_submit', $_POST)) {
-        // Retrieve input from Artist Search
         $quantity = $_POST['cart_quantity'];
         $stock = executePlainSQL("select stock AS s from album WHERE album_ID = ".$_POST['cart_input']);
         $stockarray = OCI_Fetch_Array($stock, OCI_BOTH);
@@ -209,7 +208,6 @@ if ($db_conn) {
         }
         else{
             echo "<br><br>Invalid Quantity. We currently do not carry ".$_POST['cart_quantity']." copies of that albums in our stock. Please select fewer copies.";
-
         }
     }elseif (array_key_exists('cart', $_POST)){
         header("location: cart.php?cust_email=" . $email);
