@@ -76,15 +76,18 @@
 <p><input type="submit" value="delete branch" name="DeleteBranch"></p>
 </form>
 
-
-
+<form method="POST" action="emp-account-update.php">
+<input type="submit" value="show all customers" name="ShowCust">
+<input type="submit" value="show all employees" name="ShowEmp">
+<input type="submit" value="show all branches" name="ShowBranch">
+</form>
 <?php
 
 //this tells the system that it's no longer just parsing 
 //html; it's now parsing PHP
 
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-$db_conn = OCILogon("ora_t1m8", "a34564120", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
+$db_conn = OCILogon("ora_a2v9a", "a17792145", "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.ugrad.cs.ubc.ca)(PORT = 1522)))(CONNECT_DATA=(SID=ug)))");
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
@@ -162,18 +165,17 @@ function printResult($result) { //prints results from a select statement
 }
 
 
-function printEmployeeResult($result) {
+function printEmployee($result) {
 	echo "<br> All Employees: </br>";
 	echo "<table>";
 	echo "<tr>
             <th>Name:</th>
             <th>Email:</th>
-            <th>Password:</th>
             <th>Branch #:</th>
         </tr>";
         
     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-     echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["EMP_EMAIL"] . "</td><td>" . $row["PASSWORD"] . "</td><td>" . $row["BRANCH_NO"] . "</td></tr>";
+     echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["EMP_EMAIL"] . "</td><td>" . $row["BRANCH_NO"] . "</td></tr>";
     }
     echo "</table>";
 
@@ -182,9 +184,9 @@ function printEmployeeResult($result) {
 function printCustomer($result) { //prints results from a select statement
     echo "<br>Got data from table customer:<br>";
     echo "<table>";
-    echo "<tr><th>Email</th><th>Password</th></tr>";
+    echo "<tr><th>Email</th><th>Name</th></tr>";
     while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-        echo "<tr><td>" . $row["CUST_EMAIL"] . "</td><td>" . $row["CUST_NAME"] . "</td><td>" . $row["CUST_PASSWORD"] . "</td></tr>"; //or just use "echo $row[0]"
+        echo "<tr><td>" . $row["CUST_EMAIL"] . "</td><td>" . $row["CUST_NAME"] . "</td></tr>"; //or just use "echo $row[0]"
     }
     echo "</table>";
 }
@@ -203,12 +205,12 @@ function printBranch($result) {
 if ($db_conn) {
 // 				$result = executePlainSQL("select * from customer");
 // 				printCustomer($result);
-								$result = executePlainSQL("select * from branch");
-				printBranch($result);
+				// 				$result = executePlainSQL("select * from branch");
+				// printBranch($result);
 
 
-// 	$result = executePlainSQL("select * from branch_employee");
-//  	printEmployeeResult($result);
+	// $result = executePlainSQL("select * from branch_employee");
+	//  	printEmployee($result);
 	
     if (array_key_exists('UpdateEmpAccount', $_POST)) {
 			$EmpEmail   = $_POST['EmpEmail'];
@@ -245,7 +247,7 @@ if ($db_conn) {
 			OCICommit($db_conn);
 			}
 			$result = executePlainSQL("select * from branch_employee");
-			printEmployeeResult($result);
+			printEmployee($result);
 		} 
 
 		else if (array_key_exists('UpdateCustAccount', $_POST)) {
@@ -275,14 +277,22 @@ if ($db_conn) {
 
 				}
 				
-// 		else if (array_key_exists('DeleteEmpAccount', $_POST)) {
-// 		//delete employee account 
-// 		}
+		else if (array_key_exists('DeleteEmpAccount', $_POST)) {
+			$tuple = array (
+				":bind1" => $_POST['EmpEmailDel']
+			);
+			$alltuples = array ($tuple);
+			executeBoundSQL("delete from branch_employee where emp_email=:bind1", $alltuples);
+			OCICommit($db_conn);
+			$result = executePlainSQL("select * from branch_employee");
+		 	printEmployee($result);
+		//delete employee account
+		}
 				
 				
 		else if (array_key_exists('AddBranch', $_POST)) {
 				if (empty($_POST['BranchNo']) || empty($_POST['BranchAddress']) || empty($_POST['BranchCity']) || empty($_POST['BranchProv']) || empty($_POST['BranchZip'])) {
-				//error a field is empty 
+				echo "All fields must be completed";
 				} else {
 				$tuple = array (
 					":bind1" => $_POST['BranchNo'],
@@ -300,12 +310,27 @@ if ($db_conn) {
 		}
 		
 		else if (array_key_exists('DeleteBranch', $_POST)) {
-				$tuple = array ( ":=bind1" => $_POST['BranchNoDel'] );
-				$alltuples = array ( $tuple );
-				executeBoundSQL("delete from branch where branch_no=:bind1", $alltuples);
-				OCICommit($db_conn);
-				$result = executePlainSQL("select * from branch");
-				printBranch($result);
+			$tuple = array (
+				":bind1" => $_POST['BranchNoDel']
+			);
+			$alltuples = array ($tuple);
+			executeBoundSQL("delete from branch where branch_no=:bind1", $alltuples);
+			OCICommit($db_conn);
+			$result = executePlainSQL("select * from branch");
+		 	printBranch($result);
+			$result = executePlainSQL("select * from branch_employee");
+			 	printEmployee($result);
+			
+		} else if (array_key_exists('ShowEmp', $_POST)) {
+			$result = executePlainSQL("select * from branch_employee");
+			printEmployee($result);
+		} else if (array_key_exists('ShowCust', $_POST)) {
+			$result = executePlainSQL("select * from customer");
+			printCustomer($result);
+			
+		} else if (array_key_exists('ShowBranch', $_POST)) {
+			$result = executePlainSQL("select * from branch");
+			printBranch($result);
 
 		}
 		
