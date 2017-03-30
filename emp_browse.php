@@ -63,7 +63,42 @@ function printResult($result) { //prints results from a select statement
     }
     echo "</table>";
 }
+function printAlbumNoStock($result) { //prints results from a select statement
+    echo "<p style='font-size: x-large'>Results From Your Search:</p>";
+    echo "<table>";
+    echo "<tr>
+            <th>AlbumID:</th>
+            <th>Price:</th>
+            <th>Year:</th>
+            <th>Name:</th>
+            <th>Genre:</th>
+            <th>Artist:</th>
+        </tr>";
+    while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+        echo "<tr><td>" . $row["ALBUM_ID"] . "</td><td>" . $row["PRICE"] . "</td><td>" . $row["YEAR"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["GENRE"] . "</td><td>" . $row["ARTIST"] . "</td></tr>";
+    }
+    echo "</table>";
+}
 function printSongResult($result) { //prints results from a select statement
+    echo "<p style='font-size: x-large'>Results From Your Search:</p>";
+    echo "<table>";
+    echo "<tr>
+            <th>AlbumID:</th>
+			<th>Minimum Stock:</th>
+			<th>Stock:</th>
+            <th>Year:</th>
+            <th>Name:</th>
+            <th>Genre:</th>
+            <th>Artist:</th>
+            <th>Song ID:</th>
+            <th>Song Title:</th>
+        </tr>";
+    while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+        echo "<tr><td>" . $row["ALBUM_ID"] . "</td><td>" . $row["MINIMUM_STOCK"] . "</td><td>" . $row["STOCK"] . "</td><td>" . $row["YEAR"] . "</td><td>" . $row["NAME"] . "</td><td>" . $row["GENRE"] . "</td><td>" . $row["ARTIST"] . "</td><td>" . $row["SONG_ID"] . "</td><td>" . $row["SONG_TITLE"] . "</td></tr>";
+    }
+    echo "</table>";
+}
+function printSongResultNoStock($result) { //prints results from a select statement
     echo "<p style='font-size: x-large'>Results From Your Search:</p>";
     echo "<table>";
     echo "<tr>
@@ -80,6 +115,7 @@ function printSongResult($result) { //prints results from a select statement
     }
     echo "</table>";
 }
+
 function printAlbum($result) { //prints results from a select statement
     echo "<p style='font-size: x-large'>Results From Your Search:</p>";
     echo "<table>";
@@ -125,16 +161,20 @@ function printInputError() {
 	<div id="search_by_song">
         <label for="song_search_input">Search For Song:</label><br>
         <input type="text" id="song_search_input" name="song_search_input" size="40">
+		<input type="checkbox" name="displayStockSong" value="displayStockSong" checked> Stock Information<br>
         <input type="submit" value="Search" name="song_search_submit">
+		
     </div>
 	<div id="search_by_album">
         <label for="album_search_input">Search For Album:</label><br>
         <input type="text" id="album_search_input" name="album_search_input" size="40">
+		<input type="checkbox" name="displayStockAlbum" value="displayStockAlbum" checked> Stock Information<br>
         <input type="submit" value="Search" name="album_search_submit">
     </div>
 	<div id="search_by_artist">
         <label for="artist_search_input">Search For Artist:</label><br>
         <input type="text" id="artist_search_input" name="artist_search_input" size="40">
+		<input type="checkbox" name="displayStockArtist" value="displayStockArtist" checked> Stock Information<br>
         <input type="submit" value="Search" name="artist_search_submit">
     </div>
 	
@@ -194,21 +234,41 @@ function printInputError() {
 if ($db_conn) {
 	if (array_key_exists('song_search_submit', $_POST)) {
         // Retrieve input from Song Search
-        $result = executePlainSQL("SELECT album_has_song.song_id, album_has_song.song_title, album.album_id, album.name, album.artist, album.genre, album.year FROM album INNER JOIN album_has_song ON album.album_id=album_has_song.album_id AND album_has_song.song_title LIKE '%".$_POST['song_search_input']."%' ORDER BY album.artist");
+		if (isset($_POST['displayStockSong'])){
+        $result = executePlainSQL("SELECT album_has_song.song_id, album.minimum_stock, album.stock, album_has_song.song_title, album.album_id, album.name, album.artist, album.genre, album.year FROM album INNER JOIN album_has_song ON album.album_id=album_has_song.album_id AND album_has_song.song_title LIKE '%".$_POST['song_search_input']."%' ORDER BY album.artist");
         OCICommit($db_conn);
         printSongResult($result);
+	} else {
+        $result = executePlainSQL("SELECT album_has_song.song_id, album_has_song.song_title, album.album_id, album.name, album.artist, album.genre, album.year FROM album INNER JOIN album_has_song ON album.album_id=album_has_song.album_id AND album_has_song.song_title LIKE '%".$_POST['song_search_input']."%' ORDER BY album.artist");
+        OCICommit($db_conn);
+        printSongResultNoStock($result);
+		
+	}
     } 
 	elseif (array_key_exists('album_search_submit', $_POST)) {
         // Retrieve input from Album Search
+		if (isset($_POST['displayStockAlbum'])){
         $result = executePlainSQL("select * from album WHERE name LIKE '%".$_POST['album_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
+	} else {        
+		$result = executePlainSQL("select * from album WHERE name LIKE '%".$_POST['album_search_input']."%'");
+		        OCICommit($db_conn);
+		        printAlbumNoStock($result);
+//echo "don't show stock";
+} //else don't display the stock
     } 
 	elseif (array_key_exists('artist_search_submit', $_POST)) {
         // Retrieve input from Artist Search
+		if (isset($_POST['displayStockArtist'])){
         $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
+	} else {	
+        $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
+        OCICommit($db_conn);
+        printAlbumNoStock($result);
+		}
 	} 
 	elseif(array_key_exists('update_account', $_POST)){
 		header("location: emp-account-update.php?emp_email=" . $email);
