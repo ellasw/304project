@@ -207,7 +207,7 @@ if ($db_conn) {
             //header("location: cust_browse.php?cust_email=" . $email);
         }
         else{
-            echo "<br><br>Invalid Quantity. We currently do not carry ".$_POST['cart_quantity']." copies of that albums in our stock. Please select fewer copies.";
+            echo "<br><br>Invalid Quantity. We currently do not current have ".$_POST['cart_quantity']." copies of the selected album in stock.";
         }
     }elseif (array_key_exists('cart', $_POST)){
         header("location: cart.php?cust_email=" . $email);
