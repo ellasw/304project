@@ -282,6 +282,8 @@ if ($db_conn) {
 		if(!empty($album_id) && isset($album_id) && !empty($minstock) && isset($minstock)){
 			executePlainSQL("update album set minimum_stock=" . $minstock . " where album_id=" . $album_id);
 			OCICommit($db_conn);
+        	$result = executePlainSQL("select * from album order by album_id");
+        	printAlbum($result);
 		}
 		else{
 			echo "Cannot update minstock. Please enter valid album_id and minstock";
@@ -293,6 +295,9 @@ if ($db_conn) {
 		if(!empty($album_id) && isset($album_id) && !empty($stock) && isset($stock)){
 			executePlainSQL("update album set stock=" . $stock . " where album_id=" . $album_id);
 			OCICommit($db_conn);
+        	$result = executePlainSQL("select * from album order by album_id");
+        	printAlbum($result);
+			
 		}
 		else{
 			echo "Cannot update stock. Please enter valid album_id and stock";
@@ -304,7 +309,11 @@ if ($db_conn) {
 		if(!empty($album_id) && isset($album_id) && !empty($price) && isset($price)){
 			executePlainSQL("update album set price=" . $price . " where album_id=" . $album_id);
 			OCICommit($db_conn);
+        	$result = executePlainSQL("select * from album order by album_id");
+        	printAlbum($result);
+			
 		}
+		
 		else{
 			echo "Cannot update price. Please enter valid album_id and price";
 		}
