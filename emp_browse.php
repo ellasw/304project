@@ -37,10 +37,10 @@ function executeBoundSQL($cmdstr, $list) {
 		}
         $r = OCIExecute($statement, OCI_DEFAULT);
         if (!$r) {
-            //echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
+            echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
             $e = OCI_Error($statement); // For OCIExecute errors pass the statementhandle
-            //echo htmlentities($e['message']);
-//             echo "<br>";
+            echo htmlentities($e['message']);
+            echo "<br>";
             $success = False;
         }
     }
@@ -137,33 +137,23 @@ function printInputError() {
         <input type="text" id="artist_search_input" name="artist_search_input" size="40">
         <input type="submit" value="Search" name="artist_search_submit">
     </div>
-	<div id="search_by_year">
-        <label for="album_year_input">Search For Album By Year:</label><br>
-        <input type="text" id="album_year_input" name="album_year" size="40">
-        <input type="submit" value="Search" name="search_by_year">
-    </div>
-	<div id="search_by_genre">
-        <label for="album_genre_input">Search For Album By Genre:</label><br>
-        <input type="text" id="album_genre_input" name="album_genre" size="40">
-        <input type="submit" value="Search" name="search_by_genre">
-    </div>
 	
-		<h3>Add Album </h3>
-	<form method="POST" action="emp_browse.php">
-	<p> Album ID: <input type="number" name="AlbumID"></p>
-	<p> Album Name: <input type="text" name="AlbumName"></p>
-	<p> Genre: <input type="text" name="AlbumGenre"></p>
-	<p> Artist: <input type="text" name="AlbumArtist"></p>
-	<p> Price: <input type="float" name="AlbumPrice" min="0"></p>
-	<p> Year: <input type="number" name="AlbumYear" max="2017"></p>
-	<p> Stock: <input type="number" name="AlbumStock" min="0"></p>
-	<p> Minimum Stock: <input type="number" name="AlbumMinStock" min="0"></p>
-        <input type="submit" value="Add Album" name="AddAlbum">
-</form>
-
-	<h3>Update Albums</h3>
+	<h3>Add Album</h3>
+	<div id="add_albums">
+		Album ID:<input type="number" name="AlbumID" size="3"/><br/>
+		Album Name: <input type="text" name="AlbumName" size="10"/><br/>
+		Genre: <input type="text" name="AlbumGenre" size="10"/><br/>
+		Artist: <input type="text" name="AlbumArtist" size="10"/><br/>
+		Price:<input type="float" name="AlbumPrice" size="3"/><br/>
+		Year:<input type="number" name="AlbumYear" size="3"/><br/>
+		Stock:<input type="number" name="AlbumStock" size="3"/><br/>
+		Minimum Stock:<input type="number" name="AlbumMinStock" size="3"/><br/>
+		<input type="submit" name="add_album" value="Add Album"/>
+	</div>
+	
+	<h3>Update Album</h3>
 	<div id="update_albums">
-		Album ID:<input type="text" name="album_to_update" size="3"/><br/>
+		Album ID:<input type="number" name="album_to_update" size="3"/><br/>
 		Update Minimum Stock:<input type="text" name="minstock_to_update" size="3"/>
 		<input type="submit" name="update_minstock" value="Update Min Stock"/><br/>
 		Update Album Stock:<input type="text" name="stock_to_update" size="3"/>
@@ -172,12 +162,11 @@ function printInputError() {
 		<input type="submit" name="update_price" value="Update Price"/>
 	</div>
 	
-		<h3>Delete Album</h3>
-	<form method="POST" action="emp_browse.php">
-	<p> Album ID: <input type="number" name="AlbumID"></p>
-	<input type="submit" value="Delete Album" name="DeleteAlbum">
-	</form>
-
+	<h3>Delete Album</h3>
+	<div id="delete_album">
+		Album ID:<input type="number" name="albumID_to_delete" size="3"/><br/>
+		<input type="submit" name="delete_album" value="Delete Album"/>
+		</div>
 	
 	<h3>List of Purchases</h3>
 	<div id="list_purchases">
@@ -197,6 +186,7 @@ function printInputError() {
 		<input type="submit" name="get_min_price_album_by_genre" value="Minimum Price of Each Genre"/>
 		<input type="submit" name="get_max_price_album_by_genre" value="Maximum Price of Each Genre"/>
 		<input type="submit" name="get_count_of_all_albums" value="Count of All Albums"/>
+		<input type="submit" name="get_count_by_genre" value="Count of Albums of Each Genre"/>
 	</div>
 </form>
 
@@ -209,29 +199,19 @@ if ($db_conn) {
         OCICommit($db_conn);
         printSongResult($result);
     } 
-    elseif (array_key_exists('album_search_submit', $_POST)) {
+	elseif (array_key_exists('album_search_submit', $_POST)) {
         // Retrieve input from Album Search
         $result = executePlainSQL("select * from album WHERE name LIKE '%".$_POST['album_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
     } 
-    elseif (array_key_exists('artist_search_submit', $_POST)) {
+	elseif (array_key_exists('artist_search_submit', $_POST)) {
         // Retrieve input from Artist Search
         $result = executePlainSQL("select * from album WHERE artist LIKE '%".$_POST['artist_search_input']."%'");
         OCICommit($db_conn);
         printResult($result);
 	} 
-	elseif (array_key_exists('search_by_year', $_POST)) {
-        $result = executePlainSQL("select * from album WHERE year=" . $_POST['album_year']);
-        OCICommit($db_conn);
-        printResult($result);
-    } 
-    elseif (array_key_exists('search_by_genre', $_POST)) {
-        $result = executePlainSQL("select * from album WHERE genre LIKE '%" . $_POST['album_genre'] . "%'");
-        OCICommit($db_conn);
-        printResult($result);
-    } 
-    elseif(array_key_exists('update_account', $_POST)){
+	elseif(array_key_exists('update_account', $_POST)){
 		header("location: emp-account-update.php?emp_email=" . $email);
 	}
 	elseif (array_key_exists('logout', $_POST)){
@@ -308,8 +288,13 @@ if ($db_conn) {
 		OCICommit($db_conn);
 	}
 	elseif(array_key_exists('get_count_of_all_albums', $_POST)){
-		$count = OCI_Fetch_Array(executePlainSQL("select count(*) as count from album"), OCI_BOTH);
-		echo "Total Number of Albums: " . $count["COUNT"];
+		$album = executePlainSQL("select album_id from album");
+		$count = OCI_Fetch_Array(executePlainSQL("select count(album_id) as count from album"), OCI_BOTH);
+		echo "<table><tr><th>Album ID</th></tr>";
+		while($row = OCI_Fetch_Array($album, OCI_BOTH)){
+			echo "<tr><td>" . $row['ALBUM_ID'] . "</td><td>" . $row['COUNT'] . "</td></tr>";
+		}
+		echo "</table><br/>Count of Albums: " . $count["COUNT"];
 		OCICommit($db_conn);
 	}
 	elseif(array_key_exists('get_avg_price_all_albums', $_POST)){
@@ -341,7 +326,7 @@ if ($db_conn) {
 		}
 		echo "</table>";
 		OCICommit($db_conn);
-		}
+	}
 	elseif(array_key_exists('get_max_price_album_by_genre', $_POST)){
 		$result2 = executePlainSQL("select genre, max(price) as maxprice, sum(price) as totalprice, count(*) as numingenre from album group by genre");
 		echo "<table><tr><th>Genre</th><th>Maximum Price of Genre</th><th>Total Price of Albums in Genre</th><th>Total Albums in Genre</th></tr>";
@@ -360,7 +345,7 @@ if ($db_conn) {
 		echo "</table>";
 		OCICommit($db_conn);
 	}
-	else if (array_key_exists('AddAlbum', $_POST)) {
+	elseif(array_key_exists('add_album', $_POST)) {
 		$AlbumID 	   = $_POST['AlbumID'];
 		$AlbumMinStock = $_POST['AlbumMinStock'];
 		$AlbumStock    = $_POST['AlbumStock'];
@@ -380,7 +365,6 @@ if ($db_conn) {
             	printAlbum($result);
 		} 
 		else {
-		//if there is already an album with that ID give an error and print all the albums with their IDs 
 			$tuple = array ( 
 				":bind1" => $AlbumID,
 				":bind2" => $AlbumMinStock,
@@ -406,9 +390,9 @@ if ($db_conn) {
         }
 		}
 	}
-	else if (array_key_exists('DeleteAlbum', $_POST)) {
+	elseif(array_key_exists('delete_album', $_POST)) {
 		$tuple = array (
-			":bind1" => $_POST['AlbumID']
+			":bind1" => $_POST['albumID_to_delete']
 		);
 		$alltuples = array ($tuple);
 		executeBoundSQL("delete from album where album_id=:bind1", $alltuples);
@@ -424,8 +408,11 @@ if ($db_conn) {
             	$result = executePlainSQL("select * from album order by album_id");
             	printAlbum($result);
 		}
-		}
-
+		
+	}
+		
+		
+	
     OCILogoff($db_conn);
 }
 else {
