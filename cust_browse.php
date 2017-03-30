@@ -200,7 +200,8 @@ if ($db_conn) {
         $quantity = $_POST['cart_quantity'];
         $stock = executePlainSQL("select stock AS s from album WHERE album_ID = ".$_POST['cart_input']);
         $stockarray = OCI_Fetch_Array($stock, OCI_BOTH);
-        if ($quantity <= $stockarray["S"]){
+		if ($quantity < 0) {echo "<br>Quantity must be greater than zero.";} 
+		else if ($quantity <= $stockarray["S"]){
             $result = executePlainSQL("insert into cart values('".$email."', ".$_POST['cart_input'].", ".$_POST['cart_quantity'].")");
             OCICommit($db_conn);
             printConfirm();
@@ -209,7 +210,7 @@ if ($db_conn) {
         else{
             echo "<br><br>Invalid Quantity. We currently do not current have ".$_POST['cart_quantity']." copies of the selected album in stock.";
         }
-    }elseif (array_key_exists('cart', $_POST)){
+    } elseif (array_key_exists('cart', $_POST)){
         header("location: cart.php?cust_email=" . $email);
     }
     OCILogoff($db_conn);
