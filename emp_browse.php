@@ -186,7 +186,6 @@ function printInputError() {
 		<input type="submit" name="get_min_price_album_by_genre" value="Minimum Price of Each Genre"/>
 		<input type="submit" name="get_max_price_album_by_genre" value="Maximum Price of Each Genre"/>
 		<input type="submit" name="get_count_of_all_albums" value="Count of All Albums"/>
-		<input type="submit" name="get_count_by_genre" value="Count of Albums of Each Genre"/>
 	</div>
 </form>
 
